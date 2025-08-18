@@ -31,7 +31,7 @@ export default function Home() {
           </div>
 
           {/* 核心功能按钮 */}
-          <a href="#" className={styles.mainButton}>立即寻索</a>
+          <a href="/ask" className={styles.mainButton}>立即寻索</a>
 
           {/* 功能模块展示 */}
           <div className={styles.features}>
