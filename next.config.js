@@ -8,8 +8,7 @@ const nextConfig = {
     unoptimized: true
   },
   assetPrefix: process.env.NODE_ENV === 'production' ? '' : '',
-  basePath: '',
-  distDir: 'out'
+  basePath: ''
 }
 
 module.exports = nextConfig
