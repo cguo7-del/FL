@@ -7,6 +7,15 @@ export default function Ask() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [answer, setAnswer] = useState('')
   const [connectionStatus, setConnectionStatus] = useState('未连接')
+  const [selectedStrategies, setSelectedStrategies] = useState([])
+
+  // 四大方略经纬选项
+  const strategyOptions = [
+    { id: '行正持礼', label: '行正持礼', description: '论语、孟子、礼记、近思录' },
+    { id: '顺势而为', label: '顺势而为', description: '道德经、庄子、淮南子' },
+    { id: '巧谋实战', label: '巧谋实战', description: '孙子兵法、鬼谷子、资治通鉴、三十六计' },
+    { id: '运筹帷幄', label: '运筹帷幄', description: '韩非子、商君书、盐铁论、贞观政要' }
+  ]
 
   // 测试数据库连接
   useEffect(() => {
@@ -23,6 +32,17 @@ export default function Ask() {
     testConnection()
   }, [])
 
+  // 处理方略经纬选择
+  const handleStrategyChange = (strategyId) => {
+    setSelectedStrategies(prev => {
+      if (prev.includes(strategyId)) {
+        return prev.filter(id => id !== strategyId)
+      } else {
+        return [...prev, strategyId]
+      }
+    })
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!question.trim()) return
@@ -30,22 +50,14 @@ export default function Ask() {
     setIsSubmitting(true)
     
     try {
-      // 模拟AI服务调用
-      const aiAnswer = '感谢您的提问！AI问答功能正在开发中，敬请期待。'
-      
-      // 将问答对话存储到数据库
-      await dbOperations.insert('conversations', {
+      // 跳转到答案生成页面
+      const strategyParams = selectedStrategies.length > 0 ? selectedStrategies.join(',') : ''
+      const queryParams = new URLSearchParams({
         question: question,
-        answer: aiAnswer,
-        created_at: new Date().toISOString()
+        ...(strategyParams && { strategies: strategyParams })
       })
       
-      setAnswer(aiAnswer)
-      console.log('问答已保存到数据库')
-    } catch (error) {
-      console.error('保存问答到数据库失败:', error)
-      // 即使数据库保存失败，仍然显示AI回答
-      setAnswer('感谢您的提问！AI问答功能正在开发中，敬请期待。')
+      window.location.href = `/answer?${queryParams.toString()}`
     } finally {
       setIsSubmitting(false)
     }
@@ -77,6 +89,35 @@ export default function Ask() {
               rows={6}
               disabled={isSubmitting}
             />
+          </div>
+
+          {/* 方略经纬选择区域 */}
+          <div className={styles.strategySection}>
+            <h3 className={styles.strategyTitle}>方略经纬</h3>
+            <p className={styles.strategySubtitle}>选择您希望参考的智慧方向（可多选或不选）</p>
+            <div className={styles.strategyGrid}>
+              {strategyOptions.map((strategy) => (
+                <div 
+                  key={strategy.id} 
+                  className={`${styles.strategyOption} ${selectedStrategies.includes(strategy.id) ? styles.selected : ''}`}
+                  onClick={() => handleStrategyChange(strategy.id)}
+                >
+                  <div className={styles.strategyCheckbox}>
+                    <input
+                      type="checkbox"
+                      id={strategy.id}
+                      checked={selectedStrategies.includes(strategy.id)}
+                      onChange={() => handleStrategyChange(strategy.id)}
+                      className={styles.checkbox}
+                    />
+                    <label htmlFor={strategy.id} className={styles.checkboxLabel}>
+                      <div className={styles.strategyLabel}>{strategy.label}</div>
+                      <div className={styles.strategyDescription}>{strategy.description}</div>
+                    </label>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
           
           <button 

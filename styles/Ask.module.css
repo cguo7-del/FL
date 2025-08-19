@@ -1,8 +1,8 @@
 .container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  color: #ffffff;
-  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
 }
 
 .navbar {
@@ -12,77 +12,76 @@
   padding: 1rem 2rem;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .brand {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #ffd700;
+  color: white;
 }
 
 .navLinks {
   display: flex;
+  align-items: center;
   gap: 1rem;
 }
 
 .navLink {
-  color: #ffffff;
+  color: white;
   text-decoration: none;
   padding: 0.5rem 1rem;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s;
 }
 
 .navLink:hover {
-  background: rgba(255, 215, 0, 0.2);
-  color: #ffd700;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .dbStatus {
-  color: #4CAF50;
+  color: white;
   font-size: 0.9rem;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  background: rgba(76, 175, 80, 0.1);
-  border-radius: 20px;
-  border: 1px solid rgba(76, 175, 80, 0.3);
+  opacity: 0.8;
 }
 
 .mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
+  width: 100%;
 }
 
 .header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 
 .title {
   font-size: 2.5rem;
   font-weight: bold;
-  margin-bottom: 1rem;
-  background: linear-gradient(45deg, #ffd700, #ffed4e);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: white;
+  margin-bottom: 0.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .subtitle {
   font-size: 1.1rem;
-  color: #cccccc;
-  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
 }
 
 .questionForm {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 1rem;
   padding: 2rem;
-  margin-bottom: 3rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 .inputGroup {
@@ -91,133 +90,125 @@
 
 .questionInput {
   width: 100%;
-  min-height: 150px;
   padding: 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  border: 2px solid #e1e5e9;
+  border-radius: 0.5rem;
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.5;
   resize: vertical;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s;
   font-family: inherit;
 }
 
 .questionInput:focus {
   outline: none;
-  border-color: #ffd700;
-  background: rgba(255, 255, 255, 0.15);
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .questionInput::placeholder {
-  color: #aaaaaa;
-  line-height: 1.6;
+  color: #9ca3af;
 }
 
-.questionInput:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+/* 方略经纬选择区域样式 */
+.strategySection {
+  margin-bottom: 2rem;
+}
+
+.strategyTitle {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.strategySubtitle {
+  color: #6b7280;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.strategyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.strategyOption {
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.strategyOption:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.strategyOption.selected {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.strategyCheckbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  cursor: pointer;
+  accent-color: #667eea;
+}
+
+.checkboxLabel {
+  flex: 1;
+  cursor: pointer;
+}
+
+.strategyLabel {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.25rem;
+  font-size: 1rem;
+}
+
+.strategyDescription {
+  color: #6b7280;
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 
 .submitButton {
   width: 100%;
   padding: 1rem 2rem;
-  background: linear-gradient(45deg, #ffd700, #ffed4e);
-  color: #1a1a2e;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 0.75rem;
   font-size: 1.1rem;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-family: inherit;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 .submitButton:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
 .submitButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
-}
-
-.answerSection {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 2rem;
-  margin-bottom: 3rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.answerTitle {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: #ffd700;
-  margin-bottom: 1rem;
-}
-
-.answerContent {
-  font-size: 1rem;
-  line-height: 1.8;
-  color: #ffffff;
-}
-
-.features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 3rem;
-}
-
-.featureItem {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-}
-
-.featureItem:hover {
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.featureIcon {
-  font-size: 2rem;
-  flex-shrink: 0;
-}
-
-.featureText {
-  flex: 1;
-}
-
-.featureTitle {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #ffd700;
-  margin-bottom: 0.5rem;
-}
-
-.featureDesc {
-  font-size: 0.9rem;
-  color: #cccccc;
-  line-height: 1.4;
-}
-
-.footer {
-  text-align: center;
-  padding: 2rem;
-  color: #aaaaaa;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* 响应式设计 */
@@ -242,11 +233,7 @@
     padding: 1.5rem;
   }
   
-  .features {
+  .strategyGrid {
     grid-template-columns: 1fr;
-  }
-  
-  .featureItem {
-    padding: 1rem;
   }
 }

@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  output: 'export',
+  // 移除 output: 'export' 以支持API Routes
   trailingSlash: true,
   images: {
     unoptimized: true
