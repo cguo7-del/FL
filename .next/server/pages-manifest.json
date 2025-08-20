@@ -1,9 +1,1 @@
-{
-  "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
-  "/_document": "pages/_document.js",
-  "/answer": "pages/answer.js",
-  "/": "pages/index.js",
-  "/ask": "pages/ask.js",
-  "/api/deepseek": "pages/api/deepseek.js"
-}
+{"/_app":"pages/_app.js","/answer":"pages/answer.html","/_error":"pages/_error.js","/api/deepseek":"pages/api/deepseek.js","/ask":"pages/ask.html","/":"pages/index.html","/test-db":"pages/test-db.html","/_document":"pages/_document.js","/404":"pages/404.html"}
