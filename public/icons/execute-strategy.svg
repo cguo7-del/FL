@@ -1,0 +1,53 @@
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 指南针外圈 -->
+  <circle cx="40" cy="40" r="25" fill="#f8f5f0" stroke="#d4a574" stroke-width="2.5"/>
+  <circle cx="40" cy="40" r="20" fill="none" stroke="#d4a574" stroke-width="1.5"/>
+  
+  <!-- 方位标记 -->
+  <g stroke="#d4a574" stroke-width="1.5" fill="#d4a574">
+    <!-- 北 -->
+    <path d="M40 18 L42 25 L40 23 L38 25 Z"/>
+    <text x="40" y="15" text-anchor="middle" font-size="8" fill="#d4a574">北</text>
+    
+    <!-- 东 -->
+    <path d="M62 40 L55 38 L57 40 L55 42 Z"/>
+    <text x="67" y="43" text-anchor="middle" font-size="8" fill="#d4a574">东</text>
+    
+    <!-- 南 -->
+    <path d="M40 62 L38 55 L40 57 L42 55 Z"/>
+    <text x="40" y="70" text-anchor="middle" font-size="8" fill="#d4a574">南</text>
+    
+    <!-- 西 -->
+    <path d="M18 40 L25 42 L23 40 L25 38 Z"/>
+    <text x="13" y="43" text-anchor="middle" font-size="8" fill="#d4a574">西</text>
+  </g>
+  
+  <!-- 指针 -->
+  <g stroke="#d4a574" stroke-width="2" fill="#d4a574">
+    <!-- 主指针 -->
+    <path d="M40 40 L40 25 L42 27 L40 22 L38 27 Z"/>
+    <path d="M40 40 L40 55 L38 53 L40 58 L42 53 Z" fill="#8b6914"/>
+  </g>
+  
+  <!-- 中心点 -->
+  <circle cx="40" cy="40" r="3" fill="#d4a574" stroke="#8b6914" stroke-width="1"/>
+  
+  <!-- 策略路径 -->
+  <g stroke="#d4a574" stroke-width="1.5" fill="none" opacity="0.7">
+    <path d="M40 40 Q50 30 60 35" stroke-dasharray="3,2"/>
+    <path d="M40 40 Q30 50 20 45" stroke-dasharray="3,2"/>
+    <path d="M40 40 Q55 45 50 60" stroke-dasharray="3,2"/>
+  </g>
+  
+  <!-- 装饰性刻度 -->
+  <g stroke="#d4a574" stroke-width="1" opacity="0.5">
+    <path d="M40 20 L40 22"/>
+    <path d="M40 58 L40 60"/>
+    <path d="M20 40 L22 40"/>
+    <path d="M58 40 L60 40"/>
+    <path d="M26 26 L27.5 27.5"/>
+    <path d="M52.5 52.5 L54 54"/>
+    <path d="M54 26 L52.5 27.5"/>
+    <path d="M27.5 52.5 L26 54"/>
+  </g>
+</svg>
