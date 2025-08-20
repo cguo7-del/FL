@@ -15,9 +15,8 @@ export default function Home() {
         {/* 顶部导航栏 */}
         <nav className={styles.navbar}>
           <div className={styles.brand}>方略 Fanglue</div>
-          <div className={styles.authButtons}>
-            <a href="#" className={styles.authBtn} title="功能开发中，敬请期待">登录</a>
-            <a href="#" className={styles.authBtn} title="功能开发中，敬请期待">注册</a>
+          <div className={styles.navLinks}>
+            <button className={styles.authBtn}>注册/登录</button>
           </div>
         </nav>
 
@@ -36,17 +35,23 @@ export default function Home() {
           {/* 功能模块展示 */}
           <div className={styles.features}>
             <div className={styles.featureItem}>
-              <div className={styles.featureIcon}>📜</div>
+              <div className={styles.featureIcon}>
+                <img src="/icons/explore-source.svg" alt="探源" width="60" height="60" />
+              </div>
               <div className={styles.featureTitle}>探源</div>
               <div className={styles.featureDesc}>溯古问道<br />择智珠以为引</div>
             </div>
             <div className={styles.featureItem}>
-              <div className={styles.featureIcon}>🔍</div>
+              <div className={styles.featureIcon}>
+                <img src="/icons/analyze-situation.svg" alt="析局" width="60" height="60" />
+              </div>
               <div className={styles.featureTitle}>析局</div>
               <div className={styles.featureDesc}>洞察机枢<br />见万变之本脉</div>
             </div>
             <div className={styles.featureItem}>
-              <div className={styles.featureIcon}>📈</div>
+              <div className={styles.featureIcon}>
+                <img src="/icons/execute-strategy.svg" alt="行策" width="60" height="60" />
+              </div>
               <div className={styles.featureTitle}>行策</div>
               <div className={styles.featureDesc}>授你谋纲<br />行于九地八方</div>
             </div>

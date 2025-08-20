@@ -1,24 +1,25 @@
 .container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: #f8f9fa;
   display: flex;
   flex-direction: column;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: #333;
 }
 
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 20px 50px;
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .brand {
-  font-size: 1.5rem;
+  font-size: 28px;
   font-weight: bold;
-  color: white;
+  color: #2c3e50;
 }
 
 .navLinks {
@@ -27,23 +28,22 @@
   gap: 1rem;
 }
 
-.navLink {
-  color: white;
+.authBtn {
+  padding: 8px 20px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  color: #666;
   text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  transition: background-color 0.3s;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.navLink:hover {
-  background: rgba(255, 255, 255, 0.1);
+.authBtn:hover {
+  background-color: #f5f5f5;
 }
 
-.dbStatus {
-  color: white;
-  font-size: 0.9rem;
-  opacity: 0.8;
-}
+
 
 .mainContent {
   flex: 1;
@@ -64,14 +64,13 @@
 .title {
   font-size: 2.5rem;
   font-weight: bold;
-  color: white;
+  color: #2c3e50;
   margin-bottom: 0.5rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .subtitle {
   font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: #666;
   margin: 0;
 }
 
@@ -102,8 +101,8 @@
 
 .questionInput:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #d4a574;
+  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
 }
 
 .questionInput::placeholder {
@@ -130,7 +129,7 @@
 
 .strategyGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
 
@@ -144,14 +143,14 @@
 }
 
 .strategyOption:hover {
-  border-color: #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  border-color: #d4a574;
+  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.15);
 }
 
 .strategyOption.selected {
-  border-color: #667eea;
-  background: rgba(102, 126, 234, 0.05);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  border-color: #d4a574;
+  background: rgba(212, 165, 116, 0.05);
+  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.2);
 }
 
 .strategyCheckbox {
@@ -165,7 +164,7 @@
   height: 18px;
   margin-top: 2px;
   cursor: pointer;
-  accent-color: #667eea;
+  accent-color: #d4a574;
 }
 
 .checkboxLabel {
@@ -180,35 +179,106 @@
   font-size: 1rem;
 }
 
-.strategyDescription {
-  color: #6b7280;
-  font-size: 0.85rem;
-  line-height: 1.4;
-}
+
 
 .submitButton {
   width: 100%;
-  padding: 1rem 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 15px;
+  background-color: #d4a574;
   color: white;
   border: none;
-  border-radius: 0.75rem;
-  font-size: 1.1rem;
-  font-weight: 600;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  margin-top: 20px;
+  position: relative;
+  overflow: hidden;
 }
 
-.submitButton:hover:not(:disabled) {
+.submitButton:hover {
+  background-color: #c19660;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
 .submitButton:disabled {
-  opacity: 0.6;
+  background-color: #ccc;
   cursor: not-allowed;
   transform: none;
+}
+
+.submitButton.loading {
+  background-color: white;
+  cursor: not-allowed;
+  color: #333;
+}
+
+.progressBar {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progressFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background-color: #d4a574;
+  border-radius: 8px;
+  transition: width 0.1s ease;
+}
+
+.progressText {
+  position: relative;
+  z-index: 1;
+  color: #333;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* 底部区域 */
+.footerSection {
+  background-color: #2c3e50;
+  color: #fff;
+  padding: 60px 20px;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.footerTitle {
+  font-size: 24px;
+  margin-bottom: 40px;
+  letter-spacing: 1px;
+}
+
+.footerButtons {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.footerBtn {
+  padding: 12px 30px;
+  background-color: transparent;
+  color: #fff;
+  border: 2px solid #fff;
+  text-decoration: none;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: not-allowed;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.footerBtn:hover {
+  background-color: rgba(255,255,255,0.1);
 }
 
 /* 响应式设计 */
@@ -234,6 +304,7 @@
   }
   
   .strategyGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
   }
 }

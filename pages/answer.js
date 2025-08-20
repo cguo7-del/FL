@@ -9,12 +9,30 @@ export default function Answer() {
   const [answer, setAnswer] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [loadingProgress, setLoadingProgress] = useState(0)
 
   useEffect(() => {
     if (question) {
-      generateAnswer()
-    }
-  }, [question, strategies])
+      // 启动进度条动画
+      const progressInterval = setInterval(() => {
+        setLoadingProgress(prev => {
+          if (prev >= 90) return prev // 最多到90%，等API完成
+          return prev + 1
+        })
+      }, 100) // 每100ms增加1%
+      
+      generateAnswer().finally(() => {
+        // API完成后，快速完成进度条
+        clearInterval(progressInterval)
+        setLoadingProgress(100)
+        setTimeout(() => {
+          setIsLoading(false)
+        }, 200) // 让用户看到100%
+      })
+      
+      return () => clearInterval(progressInterval)
+     }
+   }, [question])
 
   const generateAnswer = async () => {
     setIsLoading(true)
@@ -60,8 +78,6 @@ export default function Answer() {
     } catch (error) {
       console.error('生成答案失败:', error)
       setError('生成答案时出现错误，请稍后重试。')
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -460,8 +476,8 @@ const generateLocalIntelligentContent = (prompt) => {
     return (
       <div className={styles.container}>
         <div className={styles.loading}>
-          <div className={styles.loadingSpinner}></div>
-          <p>正在为您生成方略解答...</p>
+          <div className={styles.loadingSpinner} data-progress={`${loadingProgress}%`}></div>
+          <p>方略近在眼前...</p>
         </div>
       </div>
     )
@@ -486,10 +502,7 @@ const generateLocalIntelligentContent = (prompt) => {
       <nav className={styles.navbar}>
         <div className={styles.brand}>方略 Fanglue</div>
         <div className={styles.navLinks}>
-          <button onClick={() => router.back()} className={styles.navLink}>
-            返回提问
-          </button>
-          <a href="/" className={styles.navLink}>返回首页</a>
+          <button className={styles.authBtn}>注册/登录</button>
         </div>
       </nav>
 
@@ -498,7 +511,10 @@ const generateLocalIntelligentContent = (prompt) => {
           <article className={styles.answerContainer}>
             {/* 探源部分 */}
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>探源</h2>
+              <h2 className={styles.sectionTitle}>
+                <img src="/icons/explore-source.svg" alt="探源" className={styles.sectionIcon} />
+                探源
+              </h2>
               <blockquote className={styles.quote}>
                 <p className={styles.quoteText}>"{answer.探源.原文}"</p>
                 <cite className={styles.quoteSource}>- {answer.探源.出处}</cite>
@@ -511,7 +527,10 @@ const generateLocalIntelligentContent = (prompt) => {
 
             {/* 析局部分 */}
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>析局</h2>
+              <h2 className={styles.sectionTitle}>
+                <img src="/icons/analyze-situation.svg" alt="析局" className={styles.sectionIcon} />
+                析局
+              </h2>
               <p className={styles.logicAnalysis}>{answer.析局.逻辑分析}</p>
               <aside className={styles.historicalCase}>
                 <p className={styles.caseText}>{answer.析局.历史案例}</p>
@@ -520,7 +539,10 @@ const generateLocalIntelligentContent = (prompt) => {
 
             {/* 行策部分 */}
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>行策</h2>
+              <h2 className={styles.sectionTitle}>
+                <img src="/icons/execute-strategy.svg" alt="行策" className={styles.sectionIcon} />
+                行策
+              </h2>
               <p className={styles.strategyHighlight}>{answer.行策.核心策略}</p>
               <p className={styles.methodText}>{answer.行策.具体方法}</p>
               <p className={styles.warningText}>{answer.行策.风险提醒}</p>
@@ -529,8 +551,14 @@ const generateLocalIntelligentContent = (prompt) => {
         )}
       </main>
 
-      <footer className={styles.footer}>
-        <p>© 2024 方略 Fanglue - 让千载经略，为你今日一策</p>
+      {/* 底部区域 */}
+      <footer className={styles.footerSection}>
+        <div className={styles.footerTitle}>让千载经略，为你今日一策</div>
+        <div className={styles.footerButtons}>
+          <a href="#" className={styles.footerBtn} title="功能开发中，敬请期待">众议百解</a>
+          <a href="#" className={styles.footerBtn} title="功能开发中，敬请期待">一日一策</a>
+          <a href="#" className={styles.footerBtn} title="功能开发中，敬请期待">历问历答</a>
+        </div>
       </footer>
     </div>
   )
