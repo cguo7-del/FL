@@ -500,7 +500,7 @@ const generateLocalIntelligentContent = (prompt) => {
   return (
     <div className={styles.container}>
       <nav className={styles.navbar}>
-        <div className={styles.brand}>方略 Fanglue</div>
+        <div className={styles.brand} onClick={() => router.push('/')} style={{cursor: 'pointer'}}>方略 Fanglue</div>
         <div className={styles.navLinks}>
           <button className={styles.authBtn}>注册/登录</button>
         </div>

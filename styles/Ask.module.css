@@ -37,6 +37,7 @@
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-size: 16px;
 }
 
 .authBtn:hover {
