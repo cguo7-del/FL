@@ -161,6 +161,8 @@
   color: #2c3e50;
   font-weight: bold;
   text-align: right;
+  display: block;
+  width: 100%;
 }
 
 .analysis {
@@ -188,6 +190,10 @@
 
 /* 析局部分样式 */
 .logicAnalysis {
+  background: rgba(212, 165, 116, 0.1);
+  border-left: 4px solid #d4a574;
+  padding: 1.5rem;
+  border-radius: 8px;
   font-size: 1.1rem;
   color: #333;
   line-height: 1.6;
@@ -195,10 +201,10 @@
 }
 
 .historicalCase {
-  background: rgba(212, 165, 116, 0.1);
-  border-left: 4px solid #d4a574;
-  padding: 1.5rem;
-  border-radius: 8px;
+  font-size: 1rem;
+  color: #333;
+  line-height: 1.7;
+  margin: 0;
 }
 
 .caseText {
@@ -215,35 +221,37 @@
   padding: 1.5rem;
   border-radius: 8px;
   margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .strategyHighlight {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #d4a574;
+  font-size: 1rem;
+  font-weight: normal;
+  color: #333;
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.7;
 }
 
 .detailedMethod {
-  background: #f8f9fa;
+  background: #ffffff;
   padding: 1.5rem;
   border-radius: 8px;
   margin-bottom: 1rem;
+  border: 1px solid #e9ecef;
 }
 
 .methodText {
   font-size: 1rem;
   color: #333;
-  line-height: 1.8;
+  line-height: 1.7;
   margin: 0;
 }
 
 .riskWarning {
-  background: rgba(212, 165, 116, 0.1);
-  border-left: 4px solid #d4a574;
+  background: #ffffff;
   padding: 1.5rem;
   border-radius: 8px;
+  border: 1px solid #e9ecef;
 }
 
 .warningText {

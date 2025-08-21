@@ -8,16 +8,9 @@ export default function Ask() {
   const [answer, setAnswer] = useState('')
   const [connectionStatus, setConnectionStatus] = useState('未连接')
   const [selectedStrategies, setSelectedStrategies] = useState([])
+  const [strategyOptions, setStrategyOptions] = useState([])
 
-  // 四大方略经纬选项
-  const strategyOptions = [
-    { id: '行正持礼', label: '行正持礼' },
-    { id: '顺势而为', label: '顺势而为' },
-    { id: '巧谋实战', label: '巧谋实战' },
-    { id: '运筹帷幄', label: '运筹帷幄' }
-  ]
-
-  // 测试数据库连接
+  // 测试数据库连接和获取策略选项
   useEffect(() => {
     const testConnection = async () => {
       try {
@@ -29,7 +22,46 @@ export default function Ask() {
       }
     }
     
+    const fetchStrategyOptions = async () => {
+      try {
+        const { supabase } = await import('../lib/supabase')
+        const { data, error } = await supabase
+          .from('book_library')
+          .select('strategy_category')
+          .order('strategy_category')
+        
+        if (error) {
+          console.error('获取策略分类失败:', error)
+          // 使用默认选项作为备用
+          setStrategyOptions([
+            { id: '行正持礼', label: '行正持礼' },
+            { id: '顺势而为', label: '顺势而为' },
+            { id: '巧谋实战', label: '巧谋实战' },
+            { id: '运筹帷幄', label: '运筹帷幄' }
+          ])
+        } else {
+          // 去重并转换为选项格式
+          const uniqueCategories = [...new Set(data.map(item => item.strategy_category))]
+          const options = uniqueCategories.map(category => ({
+            id: category,
+            label: category
+          }))
+          setStrategyOptions(options)
+        }
+      } catch (error) {
+        console.error('获取策略分类失败:', error)
+        // 使用默认选项作为备用
+        setStrategyOptions([
+          { id: '行正持礼', label: '行正持礼' },
+          { id: '顺势而为', label: '顺势而为' },
+          { id: '巧谋实战', label: '巧谋实战' },
+          { id: '运筹帷幄', label: '运筹帷幄' }
+        ])
+      }
+    }
+    
     testConnection()
+    fetchStrategyOptions()
   }, [])
 
   // 处理方略经纬选择

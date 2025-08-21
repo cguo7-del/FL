@@ -85,21 +85,36 @@ export default function Answer() {
     // 随机选择一本书作为引用
     const randomBook = books && books.length > 0 ? books[Math.floor(Math.random() * books.length)] : null
     
-    // 安全获取原文内容（使用智能选择）
+    // 调试：打印randomBook的结构
+    console.log('调试 - randomBook对象:', randomBook)
+    console.log('调试 - randomBook字段:', randomBook ? Object.keys(randomBook) : 'null')
+    
+    // 通过网络搜索获取原文内容
     const getOriginalText = async (book) => {
-      if (!book || !book.章节内容 || typeof book.章节内容 !== 'string') {
-        return "古人云：'知己知彼，百战不殆。'"
+      console.log('调试 - getOriginalText收到的book:', book)
+      console.log('调试 - book.book_name:', book ? book.book_name : 'book为null')
+      console.log('调试 - book.书籍名称:', book ? book.书籍名称 : 'book为null')
+      
+      if (!book || (!book.book_name && !book.书籍名称)) {
+        console.log('调试 - 使用默认文本，原因：', !book ? 'book为null' : '书籍名称字段为空')
+        return {
+          text: "智者顺时而谋，愚者逆势而动。",
+          bookName: "古代典籍",
+          chapterName: "第一章"
+        }
       }
-      // 使用智能引用选择
+      // 使用网络搜索获取相关原文片段
       const quote = await selectIntelligentQuote(question, book)
-      return quote.text
+      console.log('调试 - selectIntelligentQuote返回:', quote)
+      return quote
     }
     
-    const getBookSource = (book) => {
-      if (!book || !book.书籍名称 || !book.章节名称) {
-        return "《古代典籍》"
+    const getBookSource = (quoteData) => {
+      if (!quoteData || !quoteData.bookName) {
+        return "《古代典籍·第一章》"
       }
-      return `《${book.书籍名称}·${book.章节名称}》`
+      // 显示书籍名称和章节名称
+      return `《${quoteData.bookName}·${quoteData.chapterName || '经典篇章'}》`
     }
     
     // 调用大语言模型生成答案内容
@@ -110,8 +125,8 @@ export default function Answer() {
 
 选择的方略经纬：${strategies && strategies.length > 0 ? strategies.join('、') : '无特定方向'}
 
-引用书籍：${randomBook ? `《${randomBook.书籍名称}》` : '古代典籍'}
-书籍内容：${randomBook ? randomBook.章节内容 : '古代智慧典籍'}
+引用书籍：${randomBook ? `《${randomBook.book_name}》` : '古代典籍'}
+书籍内容：${randomBook ? randomBook.chapter_content : '古代智慧典籍'}
 
 请按照以下结构生成答案，每部分都要有实质性内容，不要使用模板化语言：
 
@@ -132,14 +147,22 @@ export default function Answer() {
 
       // 这里应该调用实际的大语言模型API
       // 由于没有配置API，暂时使用基于书籍内容的智能生成
-      const generatedAnswer = await generateIntelligentAnswer(question, randomBook, strategies)
+      
+      // 先获取原文数据
+      const originalTextData = await getOriginalText(randomBook);
+      
+      // 传入原文数据生成智能答案
+      const generatedAnswer = await generateIntelligentAnswer(question, randomBook, strategies, originalTextData.text)
+      
+      // 生成问题重新表述和深层分析
+      const exploreSourceContent = await generateExploreSourceContent(question, randomBook)
       
       return {
         探源: {
-          原文: await getOriginalText(randomBook),
-          出处: getBookSource(randomBook),
-          问题转述: question,
-          深层分析: generatedAnswer.deepAnalysis
+          原文: originalTextData.text,
+          出处: getBookSource(originalTextData),
+          问题转述: exploreSourceContent.rephrased,
+          深层分析: exploreSourceContent.deepAnalysis
         },
         析局: {
           逻辑分析: generatedAnswer.logicAnalysis,
@@ -154,10 +177,12 @@ export default function Answer() {
     } catch (error) {
       console.error('生成答案内容失败:', error)
       // 如果生成失败，返回基础结构
+      const originalTextData = await getOriginalText(randomBook);
+      
       return {
         探源: {
-          原文: await getOriginalText(randomBook),
-          出处: getBookSource(randomBook),
+          原文: originalTextData.text,
+          出处: getBookSource(originalTextData),
           问题转述: question,
           深层分析: "您的问题反映了在复杂情况下寻求最佳解决方案的智慧需求。"
         },
@@ -235,12 +260,12 @@ const generateLocalIntelligentContent = (prompt) => {
   
   // 历史案例库
   const historicalCases = {
-    '管理': '春秋时期，管仲辅佐齐桓公，面对内忧外患，不急于求成，而是先稳内政、后图霸业，最终成就一代霸主。其智慧在于：急事缓做，缓事急做。',
+    '管理': '春秋时期，管仲辅佐齐桓公，面对内忧外患，不急于求成，而是先稳内政、后图霸业，最终成就一代霸主。其智慧在于急事缓做，缓事急做。',
     '决策': '战国时期，赵武灵王面临胡服骑射的重大决策时，明知会遭到保守派反对，但他通过逐步试点、示范效果的方式，最终说服了朝野上下。',
-    '竞争': '三国时期，诸葛亮在与司马懿的较量中，深知正面对抗不利，于是采用"以逸待劳"的策略，通过空城计等智谋，在实力不足的情况下仍能与强敌周旋。',
+    '竞争': '三国时期，诸葛亮在与司马懿的较量中，深知正面对抗不利，于是采用以逸待劳的策略，通过空城计等智谋，在实力不足的情况下仍能与强敌周旋。',
     '团队': '汉初，刘邦能够统一天下，关键在于他善于团结各方人才，对张良用其智，对韩信用其勇，对萧何用其能，让每个人都能发挥所长。',
     '挑战': '明朝时期，于谦在土木堡之变后临危受命，面对瓦剌大军的压境的危局，他没有慌乱，而是冷静分析形势，调动一切可用资源，最终成功保卫了北京。',
-    '策略': '孙武在《孙子兵法》中提出"兵者，诡道也"，强调策略的灵活性和适应性，根据不同情况采用不同的战术，这一思想至今仍有重要指导意义。'
+    '策略': '孙武在《孙子兵法》中提出兵者，诡道也，强调策略的灵活性和适应性，根据不同情况采用不同的战术，这一思想至今仍有重要指导意义。'
   };
   
   // 根据prompt类型生成不同内容
@@ -279,10 +304,113 @@ const generateLocalIntelligentContent = (prompt) => {
   return '古人云："智者顺时而谋，愚者逆势而动。"关键在于把握时机，顺势而为。';
 };
 
-  // 基于书籍内容的智能答案生成函数（优化并行处理）
-  const generateIntelligentAnswer = async (question, book, strategies) => {
+  // 生成探源部分内容：问题重新表述和深层分析
+  const generateExploreSourceContent = async (question, book) => {
     try {
-      const bookTitle = book ? book.书籍名称 : '古代典籍';
+      // 使用大语言模型重新表述问题并分析深层困扰
+      const prompt = `请对以下用户问题进行重新表述和深层分析：
+
+用户问题：${question}
+
+要求：
+1. 首先用一句话重新表述用户的问题，让这个问题看起来更加简洁直接一针见血
+2. 然后分析用户背后的真实困扰，用第二人称增强互动感
+3. 整体内容放在一段中，不要分开
+4. 不要使用破折号（—）等符号
+5. 参考示例风格："老板总是把棘手的项目推给你，你应该怎么办？你担心的不是任务本身，而是接了之后搞砸，被老板当成背锅侠，同时失去在团队的信任和话语权。你真正想知道的是，既不能硬拒绝，又不想做无谓牺牲，该如何两全？"
+
+请直接返回重新表述的问题和深层分析内容，不要添加其他说明。`;
+      
+      // 尝试调用DeepSeek API
+      const apiResponse = await callDeepSeekAPI(prompt);
+      
+      if (apiResponse && apiResponse !== '智能分析生成中，请稍候...' && !apiResponse.includes('生成内容失败')) {
+        // API调用成功，解析返回内容
+        const content = apiResponse.trim();
+        
+        // 尝试分离重新表述的问题和深层分析
+        const sentences = content.split(/[？?]/)
+        if (sentences.length >= 2) {
+          const rephrased = sentences[0] + '？'
+          const deepAnalysis = sentences.slice(1).join('？').replace(/^[？?]/, '').trim()
+          
+          return {
+            rephrased: rephrased,
+            deepAnalysis: deepAnalysis || content
+          }
+        }
+        
+        // 如果无法分离，将整体内容作为深层分析，问题转述使用原问题
+        return {
+          rephrased: question,
+          deepAnalysis: content
+        }
+      }
+      
+      // API调用失败，使用本地智能生成
+      return generateLocalExploreContent(question)
+      
+    } catch (error) {
+      console.error('生成探源内容失败:', error)
+      return generateLocalExploreContent(question)
+    }
+  }
+  
+  // 本地探源内容生成
+  const generateLocalExploreContent = (question) => {
+    // 分析问题类型和关键词
+    const problemTypes = {
+      '工作': ['职场', '同事', '老板', '项目', '任务', '升职', '跳槽'],
+      '管理': ['团队', '下属', '领导', '决策', '管理', '协调'],
+      '人际': ['朋友', '家人', '关系', '沟通', '矛盾', '冲突'],
+      '选择': ['选择', '决定', '犹豫', '纠结', '方向', '道路'],
+      '困难': ['困难', '挫折', '失败', '压力', '焦虑', '迷茫']
+    }
+    
+    let problemType = '困难'
+    for (const [type, keywords] of Object.entries(problemTypes)) {
+      if (keywords.some(keyword => question.includes(keyword))) {
+        problemType = type
+        break
+      }
+    }
+    
+    // 根据问题类型生成重新表述和深层分析
+    const templates = {
+      '工作': {
+        rephrased: `${question.replace(/[？?]$/, '')}，你该如何应对？`,
+        deepAnalysis: '你担心的不只是眼前的问题，而是这件事可能影响你在职场中的地位和发展。你真正想知道的是，如何在维护自己利益的同时，又不破坏与同事和上级的关系。'
+      },
+      '管理': {
+        rephrased: `面对${question.replace(/[？?]$/, '')}的情况，你应该怎么处理？`,
+        deepAnalysis: '你的困扰不在于不知道该做什么，而在于如何平衡各方利益，既要达成目标，又要维护团队和谐。你真正需要的是一套既有效又不伤和气的解决方案。'
+      },
+      '人际': {
+        rephrased: `${question.replace(/[？?]$/, '')}，你该如何处理这种关系？`,
+        deepAnalysis: '你在意的不是对错，而是如何在坚持自己原则的同时，不伤害彼此的感情。你真正想要的是既能解决问题，又能维护关系的双赢方案。'
+      },
+      '选择': {
+        rephrased: `面临${question.replace(/[？?]$/, '')}的选择，你该如何决定？`,
+        deepAnalysis: '你的纠结不在于选项本身，而在于担心选错了方向会后悔。你真正需要的是一个清晰的判断标准，让你能够坚定地做出选择并承担结果。'
+      },
+      '困难': {
+        rephrased: `遇到${question.replace(/[？?]$/, '')}的困难，你该怎么办？`,
+        deepAnalysis: '你的焦虑不只是来自困难本身，更来自对未知结果的担忧。你真正想要的是一种面对困难的勇气和方法，让你能够从容应对各种挑战。'
+      }
+    }
+    
+    const template = templates[problemType] || templates['困难']
+    
+    return {
+      rephrased: template.rephrased,
+      deepAnalysis: template.deepAnalysis
+    }
+  }
+
+  // 基于书籍内容的智能答案生成函数（优化并行处理）
+  const generateIntelligentAnswer = async (question, book, strategies, originalText) => {
+    try {
+      const bookTitle = book ? book.book_name : '古代典籍';
       const strategiesText = strategies && strategies.length > 0 
         ? strategies.join('、') 
         : '综合智慧';
@@ -297,14 +425,17 @@ const generateLocalIntelligentContent = (prompt) => {
 2. 用1-2句话分析真实困扰
 3. 语言简洁有力，直击要害`;
       
-      // 并行调用所有API，无超时限制
+      // 先生成逻辑分析，然后基于逻辑分析生成历史案例
+      const logicAnalysis = await generateLogicAnalysis(question, book, strategies, originalText);
+      
+      // 并行调用其他API，无超时限制
       const promises = [
         callDeepSeekAPI(analysisPrompt),
-        generateLogicAnalysis(question, book, strategies),
-        generateRelevantHistoricalCase(question, book),
-        generateCoreStrategy(question, book, strategies),
-        generateDetailedMethod(question, book, strategies),
-        generateRiskWarning(question, book)
+        Promise.resolve(logicAnalysis), // 已经生成的逻辑分析
+        generateRelevantHistoricalCase(question, book, originalText, logicAnalysis),
+        generateCoreStrategy(question, book, strategies, originalText, logicAnalysis),
+        generateDetailedMethod(question, book, strategies, originalText, logicAnalysis),
+        generateRiskWarning(question, book, originalText, logicAnalysis)
       ];
       
       // 使用Promise.allSettled确保即使部分失败也能继续，无时间限制
@@ -367,109 +498,158 @@ const generateLocalIntelligentContent = (prompt) => {
   }
   
   // 生成书中逻辑拆解
-  const generateLogicAnalysis = async (question, book, strategies) => {
-    if (!book) return '古籍智慧指引方向，核心在于顺势而为。';
+  const generateLogicAnalysis = async (question, book, strategies, originalText) => {
+    if (!originalText) return '子女应主动关怀父母，这是为人子女的根本责任。';
     
-    const logicPrompt = `古籍：《${book.书籍名称}》
+    const logicPrompt = `原文："${originalText}"
 用户问题："${question}"
 
-请用1-2句话简要拆解这本古籍中与用户问题相关的核心逻辑。要求：
-1. 直接点出书中的核心智慧
-2. 语言简洁有力
-3. 与用户问题紧密相关`;
+请用1-2句话简要拆解这段原文的核心逻辑，要求：
+1. 直接从核心逻辑开始，不要加"原文核心是"、"这段话说的是"等开头
+2. 语言简洁有力，现代化表达
+3. 与用户问题紧密相关
+4. 不要使用破折号等符号
+5. 用现代语言重新表达古文的智慧
+
+参考示例格式："子女应主动关怀父母，冬季保暖夏季清凉，晚上安顿早上问安。这提醒你假期选择：拓宽视野固然重要，但亲情陪伴是为人子女的根本责任。"`;
     
     const logic = await callDeepSeekAPI(logicPrompt);
-    return logic || `《${book.书籍名称}》强调顺势而为，核心在于把握时机与人心。`;
+    return logic || '子女应主动关怀父母，这是为人子女的根本责任，把握时机与人心。';
   }
   
   // 生成历史案例
-  const generateRelevantHistoricalCase = async (question, book) => {
-    const casePrompt = `用户问题："${question}"
+  const generateRelevantHistoricalCase = async (question, book, originalText, logicAnalysis) => {
+    const casePrompt = `原文："${originalText}"
+核心逻辑：${logicAnalysis}
+用户问题："${question}"
 
-请提供一个简短、生动、有画面感的真实历史案例来说明类似问题的解决之道。要求：
-1. 真实的历史人物和事件
-2. 与用户问题高度相关
-3. 语言生动有画面感
-4. 控制在100字以内
-5. 突出解决问题的智慧`;
+请提供一个简短、生动、有画面感的真实历史案例来侧面论证这个核心逻辑。要求：
+1. 必须是真实的历史人物和事件，不能虚构
+2. 与原文的核心逻辑高度相关，能够印证这个智慧
+3. 语言生动有画面感，有具体的人物、时间、地点、行为细节
+4. 控制在80-120字之间
+5. 不要使用破折号、引号等符号
+6. 突出智慧策略的巧妙运用和效果
+7. 要有具体的历史背景和结果
+
+参考示例格式：明成祖永乐年间，建文旧臣方孝孺被朱棣派去劝降南方叛军，他并不急着传旨，而是要求叛军面见皇帝，把时间拖到朱棣亲自带兵赶来。叛军以为有谈判机会，松懈戒备，结果被朱棣突袭全歼`;
     
     const historicalCase = await callDeepSeekAPI(casePrompt);
-    return historicalCase || '春秋时期，管仲辅佐齐桓公，面对内忧外患，不急于求成，而是先稳内政、后图霸业，最终成就一代霸主。其智慧在于：急事缓做，缓事急做。';
+    return historicalCase || '春秋时期，管仲辅佐齐桓公，面对内忧外患，不急于求成，而是先稳内政、后图霸业，最终成就一代霸主。其智慧在于急事缓做，缓事急做。';
   }
   
   // 生成核心策略（高能摘要）
-  const generateCoreStrategy = async (question, book, strategies) => {
+  const generateCoreStrategy = async (question, book, strategies, originalText, logicAnalysis) => {
     const strategiesText = strategies && strategies.length > 0 
       ? strategies.join('、') 
       : '综合智慧';
     
     const strategyPrompt = `用户问题："${question}"
+原文："${originalText}"
+逻辑分析："${logicAnalysis}"
 方略经纬：${strategiesText}
 
-请给出一个快准狠的高能摘要，作为解决问题的核心策略。要求：
-1. 语言简洁有力
-2. 直击问题要害
-3. 具有可操作性
-4. 控制在50字以内
-5. 体现古代智慧的精髓`;
+请给出一个快准狠的高能摘要答案，作为解决问题的核心策略。要求：
+1. 用1-2句话给出直接有效的解决方案
+2. 语言简洁有力，直击要害
+3. 基于原文和逻辑分析的智慧
+4. 控制在60字以内
+5. 参考示例："所以，如果老板把高风险项目甩给你，先别急着全盘接，让他亲自站台背书，你只做执行的刀，责任在他。"`;
     
     const coreStrategy = await callDeepSeekAPI(strategyPrompt);
     return coreStrategy || '先稳后进，以静制动。明确目标，分步实施，借势而为，化危为机。';
   }
   
   // 生成详细解决方法
-  const generateDetailedMethod = async (question, book, strategies) => {
+  const generateDetailedMethod = async (question, book, strategies, originalText, logicAnalysis) => {
     const strategiesText = strategies && strategies.length > 0 
       ? strategies.join('、') 
       : '综合智慧';
     
     const methodPrompt = `用户问题："${question}"
+原文："${originalText}"
+逻辑分析："${logicAnalysis}"
 方略经纬：${strategiesText}
 
-请详细给出解决方法，要求：
-1. 分步骤、有逻辑
-2. 具体可操作
-3. 结合古代智慧
-4. 语言简洁明了
-5. 控制在200字以内`;
+请用第二人称详细说明具体的解决方法，要求：
+1. 使用第二人称（你），有画面感和代入感
+2. 不要列步骤一二三四，要自然流畅的叙述
+3. 具体可操作，有细节描述
+4. 基于原文智慧和逻辑分析
+5. 控制在200-300字
+6. 参考示例风格："你可以笑着抛个球：'这个项目牵涉到好几个部门，您帮我们定个方向吧。'老板一听，自然就站到台前成了'项目主人'。之后每次开关键会议，你都先请他开场定调，而你在一旁安静记录细节、补位执行——这样，大家心里都默认，他是最终拍板的人。在项目推进的过程中，任何一点风险，你都第一时间写成邮件或会议纪要抄送老板，让证据落在纸面上，也给自己留条后路。与此同时，你还可以刻意创造一些可见的小成绩——比如提前交付一个阶段成果、或者悄悄解决一个老大难问题——让大家记住你的价值，但不要抢风头，也不要急着当“全能救世主”。"`;
     
     const detailedMethod = await callDeepSeekAPI(methodPrompt);
-    return detailedMethod || `第一步：明确目标，理清思路。第二步：分析现状，找准问题根源。第三步：制定计划，分步实施。第四步：调动资源，凝聚力量。第五步：持续跟进，及时调整。关键在于稳扎稳打，步步为营。`;
+    return detailedMethod || `你可以先主动找对方沟通，了解真实想法和顾虑。在交流过程中，保持开放的心态，认真倾听对方的观点。然后寻找双方的共同利益点，从这个角度提出解决方案。同时，你要展现出诚意和耐心，让对方感受到你的善意。关键在于以诚待人，以理服人。`;
   }
   
   // 生成风险示警
-  const generateRiskWarning = async (question, book) => {
+  const generateRiskWarning = async (question, book, originalText, logicAnalysis) => {
     const warningPrompt = `用户问题："${question}"
+原文："${originalText}"
+逻辑分析："${logicAnalysis}"
 
-请给出一个简短的示警，提醒用户在解决问题过程中需要注意的风险。要求：
-1. 语言简洁有力
-2. 直指关键风险
-3. 具有警示作用
-4. 控制在50字以内
-5. 体现古代智慧的谨慎`;
+请给出1-2句话的风险提醒，说明用这个方法需要注意的方向。要求：
+1. 基于原文智慧和逻辑分析
+2. 指出关键风险点和注意事项
+3. 语言温和但有警示作用，用类似"不过..."开头，避免"需警惕"等生硬表达
+4. 控制在80字以内
+5. 可以引用历史教训作为反面例子
+6. 参考示例："不过要记住，这不是'甩锅不干'。北宋末年王安石误判局势，对辽军挑衅一味按兵不动，结果士气崩溃，丢了燕云十六州。把责任上移的前提，是你自己也要在执行中贡献成果，否则你会被看成推卸责任。"`;
     
     const riskWarning = await callDeepSeekAPI(warningPrompt);
-    return riskWarning || '切忌急功近利，欲速则不达。过程中需防范利益冲突，保持初心不变。';
+    return riskWarning || '不过切忌急功近利，欲速则不达。过程中需防范利益冲突，保持初心不变。';
   }
   
   // 智能选择引用
-  const selectIntelligentQuote = async (question, book) => {
-    if (!book) return { text: '智者顺时而谋，愚者逆势而动。', source: '古代智慧' };
+  // 通过网络搜索获取书籍原文片段
+  const searchBookQuotes = async (question, strategy_category) => {
+    try {
+      // 调用新的后端搜索API
+      const response = await fetch('/api/search-quotes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          question: question,
+          strategy_category: strategy_category
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.quote && data.quote.length > 5) {
+          return {
+            text: data.quote,
+            source: `${data.bookName}·${data.chapterName}`,
+            bookName: data.bookName,
+            chapterName: data.chapterName,
+            fromNetworkSearch: data.fromNetworkSearch
+          };
+        }
+      }
+    } catch (error) {
+      console.error('网络搜索失败:', error);
+    }
     
-    const quotePrompt = `古籍：《${book.书籍名称}》
-用户问题："${question}"
-
-请从这本古籍的智慧中，选择或生成一句与用户问题高度相关的经典语录。要求：
-1. 语言简洁有力
-2. 与问题高度相关
-3. 体现古代智慧
-4. 控制在30字以内`;
-    
-    const quote = await callDeepSeekAPI(quotePrompt);
+    // 搜索失败时的备用方案
     return {
-      text: quote || '知己知彼，百战不殆。',
-      source: book.书籍名称
+      text: '智者顺时而谋，愚者逆势而动。',
+      source: '智慧经典·第一章',
+      bookName: '智慧经典',
+      chapterName: '第一章',
+      fromNetworkSearch: false
     };
+  }
+
+  const selectIntelligentQuote = async (question, book) => {
+    if (!book || (!book.book_name && !book.书籍名称)) {
+      return { text: '智者顺时而谋，愚者逆势而动。', source: '古代智慧' };
+    }
+    
+    // 使用网络搜索获取原文片段，传递策略类别
+    return await searchBookQuotes(question, book.strategy_category);
   }
 
   if (isLoading) {
@@ -517,11 +697,10 @@ const generateLocalIntelligentContent = (prompt) => {
               </h2>
               <blockquote className={styles.quote}>
                 <p className={styles.quoteText}>"{answer.探源.原文}"</p>
-                <cite className={styles.quoteSource}>- {answer.探源.出处}</cite>
+                <cite className={styles.quoteSource}>-{answer.探源.出处}</cite>
               </blockquote>
               <div className={styles.analysis}>
-                <p className={styles.questionRestate}>{answer.探源.问题转述}</p>
-                <p className={styles.deepAnalysis}>{answer.探源.深层分析}</p>
+                <p>{answer.探源.深层分析}</p>
               </div>
             </section>
 
@@ -543,9 +722,18 @@ const generateLocalIntelligentContent = (prompt) => {
                 <img src="/icons/execute-strategy.svg" alt="行策" className={styles.sectionIcon} />
                 行策
               </h2>
-              <p className={styles.strategyHighlight}>{answer.行策.核心策略}</p>
-              <p className={styles.methodText}>{answer.行策.具体方法}</p>
-              <p className={styles.warningText}>{answer.行策.风险提醒}</p>
+              {/* 核心策略 - 有阴影框 */}
+              <div className={styles.coreStrategy}>
+                <p className={styles.strategyHighlight}>{answer.行策.核心策略}</p>
+              </div>
+              {/* 具体方法 - 白色底色 */}
+              <div className={styles.detailedMethod}>
+                <p className={styles.methodText}>{answer.行策.具体方法}</p>
+              </div>
+              {/* 风险提醒 - 白色底色 */}
+              <div className={styles.riskWarning}>
+                <p className={styles.warningText}>{answer.行策.风险提醒}</p>
+              </div>
             </section>
           </article>
         )}
