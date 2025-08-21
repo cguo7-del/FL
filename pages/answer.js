@@ -492,7 +492,7 @@ const generateLocalIntelligentContent = (prompt) => {
     if (question.includes('决策') || question.includes('选择')) keywords.push('决策')
     if (question.includes('竞争') || question.includes('对手')) keywords.push('竞争')
     if (question.includes('团队') || question.includes('合作')) keywords.push('团队')
-    if (question.includes('困难') || question.includes('挑战')) keywords.push('挑战')
+    if (question.includes('困难') || question.includes('挑战')) keywords.push('困难')
     if (question.includes('策略') || question.includes('方法')) keywords.push('策略')
     return keywords
   }
@@ -577,7 +577,8 @@ const generateLocalIntelligentContent = (prompt) => {
 3. 具体可操作，有细节描述
 4. 基于原文智慧和逻辑分析
 5. 控制在200-300字
-6. 参考示例风格："你可以笑着抛个球：'这个项目牵涉到好几个部门，您帮我们定个方向吧。'老板一听，自然就站到台前成了'项目主人'。之后每次开关键会议，你都先请他开场定调，而你在一旁安静记录细节、补位执行——这样，大家心里都默认，他是最终拍板的人。在项目推进的过程中，任何一点风险，你都第一时间写成邮件或会议纪要抄送老板，让证据落在纸面上，也给自己留条后路。与此同时，你还可以刻意创造一些可见的小成绩——比如提前交付一个阶段成果、或者悄悄解决一个老大难问题——让大家记住你的价值，但不要抢风头，也不要急着当“全能救世主”。"`;
+6. 直接给出具体方法，不要包含任何改写说明、格式说明或元描述
+7. 参考示例风格："你可以笑着抛个球：'这个项目牵涉到好几个部门，您帮我们定个方向吧。'老板一听，自然就站到台前成了'项目主人'。之后每次开关键会议，你都先请他开场定调，而你在一旁安静记录细节、补位执行——这样，大家心里都默认，他是最终拍板的人。在项目推进的过程中，任何一点风险，你都第一时间写成邮件或会议纪要抄送老板，让证据落在纸面上，也给自己留条后路。与此同时，你还可以刻意创造一些可见的小成绩——比如提前交付一个阶段成果、或者悄悄解决一个老大难问题——让大家记住你的价值，但不要抢风头，也不要急着当"全能救世主"。"`;
     
     const detailedMethod = await callDeepSeekAPI(methodPrompt);
     return detailedMethod || `你可以先主动找对方沟通，了解真实想法和顾虑。在交流过程中，保持开放的心态，认真倾听对方的观点。然后寻找双方的共同利益点，从这个角度提出解决方案。同时，你要展现出诚意和耐心，让对方感受到你的善意。关键在于以诚待人，以理服人。`;
@@ -595,7 +596,8 @@ const generateLocalIntelligentContent = (prompt) => {
 3. 语言温和但有警示作用，用类似"不过..."开头，避免"需警惕"等生硬表达
 4. 控制在80字以内
 5. 可以引用历史教训作为反面例子
-6. 参考示例："不过要记住，这不是'甩锅不干'。北宋末年王安石误判局势，对辽军挑衅一味按兵不动，结果士气崩溃，丢了燕云十六州。把责任上移的前提，是你自己也要在执行中贡献成果，否则你会被看成推卸责任。"`;
+6. 直接给出风险提醒，不要包含任何改写说明、格式说明或元描述
+7. 参考示例："不过要记住，这不是'甩锅不干'。北宋末年王安石误判局势，对辽军挑衅一味按兵不动，结果士气崩溃，丢了燕云十六州。把责任上移的前提，是你自己也要在执行中贡献成果，否则你会被看成推卸责任。"`;
     
     const riskWarning = await callDeepSeekAPI(warningPrompt);
     return riskWarning || '不过切忌急功近利，欲速则不达。过程中需防范利益冲突，保持初心不变。';

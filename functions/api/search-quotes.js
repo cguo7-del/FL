@@ -278,11 +278,22 @@ function extractOriginalText(content, bookName) {
   // 移除常见的AI回复前缀
   let text = content.replace(/^(以下是|根据|从《.*?》中找到的相关原文[:：]?|相关原文[:：]?)/i, '');
   
+  // 移除编号（如"1. "、"2. "、"一、"、"二、"等）
+  text = text.replace(/^\d+[.、]\s*/gm, '');
+  text = text.replace(/^[一二三四五六七八九十][、.]\s*/gm, '');
+  
+  // 移除出处信息（如"——《韩非子·难二》"、"出自《韩非子》"等）
+  text = text.replace(/——《.*?》.*?$/gm, '');
+  text = text.replace(/出自《.*?》.*?$/gm, '');
+  text = text.replace(/来源[:：]《.*?》.*?$/gm, '');
+  text = text.replace(/（《.*?》）/g, '');
+  text = text.replace(/\(《.*?》\)/g, '');
+  
   // 移除引号
   text = text.replace(/^[""'']|[""'']$/g, '');
   
-  // 移除多余的空白字符
-  text = text.trim();
+  // 移除多余的空白字符和换行
+  text = text.replace(/\s+/g, '').trim();
   
   // 如果文本太短或太长，可能不是有效的原文
   if (text.length < 5 || text.length > 500) {
