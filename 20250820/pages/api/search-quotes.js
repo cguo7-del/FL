@@ -101,7 +101,7 @@ async function searchOriginalTextWithAI(bookName, question) {
     console.log('AI搜索原文查询:', searchQuery);
 
     // 调用DeepSeek API
-    const response = await fetch('http://localhost:3001/api/deepseek', {
+    const response = await fetch('/api/deepseek', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -174,7 +174,7 @@ async function searchChapterNameWithAI(bookName, originalText) {
     
     console.log('AI搜索章节名查询:', searchQuery);
 
-    const response = await fetch('http://localhost:3001/api/deepseek', {
+    const response = await fetch('/api/deepseek', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
