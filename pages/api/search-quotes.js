@@ -101,13 +101,21 @@ async function searchOriginalTextWithAI(bookName, question) {
     console.log('AI搜索原文查询:', searchQuery);
 
     // 调用DeepSeek API
-    const response = await fetch('/api/deepseek', {
+    const response = await fetch('https://api.deepseek.com/chat/completions', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer sk-3dd5328db9d44d9cb4e6e7df02ee4b2d'
       },
       body: JSON.stringify({
-        prompt: searchQuery
+        model: 'deepseek-chat',
+        messages: [{
+          role: 'user',
+          content: searchQuery
+        }],
+        temperature: 0.7,
+        max_tokens: 2000,
+        stream: false
       })
     });
 
@@ -118,9 +126,10 @@ async function searchOriginalTextWithAI(bookName, question) {
 
     const data = await response.json();
     
-    if (data.content && data.content.length > 10) {
+    if (data.choices && data.choices.length > 0 && data.choices[0].message.content && data.choices[0].message.content.length > 10) {
+      const content = data.choices[0].message.content;
       // 提取原文内容
-      const originalText = extractOriginalText(data.content, bookName);
+      const originalText = extractOriginalText(content, bookName);
       
       if (originalText && originalText.length > 10) {
         return originalText;
@@ -174,13 +183,21 @@ async function searchChapterNameWithAI(bookName, originalText) {
     
     console.log('AI搜索章节名查询:', searchQuery);
 
-    const response = await fetch('/api/deepseek', {
+    const response = await fetch('https://api.deepseek.com/chat/completions', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer sk-3dd5328db9d44d9cb4e6e7df02ee4b2d'
       },
       body: JSON.stringify({
-        prompt: searchQuery
+        model: 'deepseek-chat',
+        messages: [{
+          role: 'user',
+          content: searchQuery
+        }],
+        temperature: 0.7,
+        max_tokens: 2000,
+        stream: false
       })
     });
 
@@ -190,8 +207,8 @@ async function searchChapterNameWithAI(bookName, originalText) {
 
     const data = await response.json();
     
-    if (data.content) {
-      const chapterName = extractChapterName(data.content);
+    if (data.choices && data.choices.length > 0 && data.choices[0].message.content) {
+      const chapterName = extractChapterName(data.choices[0].message.content);
       if (chapterName) {
         return chapterName;
       }
