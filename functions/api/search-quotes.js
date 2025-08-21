@@ -1,9 +1,12 @@
 // Cloudflare Pages Function for search-quotes API
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://ixjlvqvwbgqjqkqhzxzx.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4amx2cXZ3YmdxanFrcWh6eHp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ1MjU2NzMsImV4cCI6MjA1MDEwMTY3M30.Aw6Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8';
-const supabase = createClient(supabaseUrl, supabaseKey);
+// 使用环境变量配置Supabase
+const getSupabaseClient = (env) => {
+  const supabaseUrl = env.SUPABASE_URL || 'https://crnfwlpcxrnqfgwqnmun.supabase.co';
+  const supabaseKey = env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNybmZ3bHBjeHJucWZnd3FubXVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxNTAzMDQsImV4cCI6MjA3MDcyNjMwNH0.g_HmFQQiuGW2TZRzZ5gqCj098DZy6iwn_xQAE6kEUEI';
+  return createClient(supabaseUrl, supabaseKey);
+};
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -20,8 +23,11 @@ export async function onRequestPost(context) {
 
     console.log('收到搜索请求:', { question, strategy_category });
 
+    // 获取Supabase客户端
+    const supabase = getSupabaseClient(env);
+
     // 步骤1: 根据用户选定的方向从Supabase选择书籍
-    const selectedBook = await selectBookByStrategy(strategy_category);
+    const selectedBook = await selectBookByStrategy(strategy_category, supabase);
     if (!selectedBook) {
       return new Response(JSON.stringify({ error: '未找到对应策略的书籍' }), {
         status: 404,
@@ -50,7 +56,7 @@ export async function onRequestPost(context) {
     console.log('找到的原文:', originalText);
 
     // 步骤3: 根据原文用AI搜索对应的章节名称
-    const chapterName = await searchChapterNameWithAI(selectedBook.book_name, originalText, env);
+    const chapterName = await searchChapterNameWithAI(selectedBook.book_name, originalText, env, supabase);
     
     console.log('识别的章节名:', chapterName);
 
@@ -83,7 +89,7 @@ export async function onRequestPost(context) {
 }
 
 // 根据策略类别选择书籍
-async function selectBookByStrategy(strategy_category) {
+async function selectBookByStrategy(strategy_category, supabase) {
   try {
     const { data: books, error } = await supabase
       .from('book_library')
@@ -198,7 +204,7 @@ async function searchOriginalTextFallback(bookName, question) {
 }
 
 // 用AI搜索章节名称
-async function searchChapterNameWithAI(bookName, originalText, env) {
+async function searchChapterNameWithAI(bookName, originalText, env, supabase) {
   try {
     const searchQuery = `这段原文"${originalText}"出自《${bookName}》的哪个章节？请只返回章节名称，不要其他解释`;
     
@@ -223,7 +229,7 @@ async function searchChapterNameWithAI(bookName, originalText, env) {
     });
 
     if (!response.ok) {
-      return await searchChapterNameFallback(bookName, originalText);
+      return await searchChapterNameFallback(bookName, originalText, supabase);
     }
 
     const data = await response.json();
@@ -236,16 +242,16 @@ async function searchChapterNameWithAI(bookName, originalText, env) {
       }
     }
 
-    return await searchChapterNameFallback(bookName, originalText);
+    return await searchChapterNameFallback(bookName, originalText, supabase);
 
   } catch (error) {
     console.error('AI搜索章节名失败:', error);
-    return await searchChapterNameFallback(bookName, originalText);
+    return await searchChapterNameFallback(bookName, originalText, supabase);
   }
 }
 
 // 备用方案：从数据库获取章节名
-async function searchChapterNameFallback(bookName, originalText) {
+async function searchChapterNameFallback(bookName, originalText, supabase) {
   try {
     const { data: books, error } = await supabase
       .from('book_library')
