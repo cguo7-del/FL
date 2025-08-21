@@ -14,5 +14,9 @@
   "../node_modules/@supabase/storage-js/dist/module/lib/helpers.js -> @supabase/node-fetch": {
     "id": "../node_modules/@supabase/storage-js/dist/module/lib/helpers.js -> @supabase/node-fetch",
     "files": []
+  },
+  "ask.js -> ../lib/supabase": {
+    "id": "ask.js -> ../lib/supabase",
+    "files": []
   }
 }

@@ -3,5 +3,8 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/answer": "pages/answer.js",
-  "/api/search-quotes": "pages/api/search-quotes.js"
+  "/api/search-quotes": "pages/api/search-quotes.js",
+  "/api/deepseek": "pages/api/deepseek.js",
+  "/": "pages/index.js",
+  "/ask": "pages/ask.js"
 }

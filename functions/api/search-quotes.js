@@ -278,9 +278,12 @@ function extractOriginalText(content, bookName) {
   // 移除常见的AI回复前缀
   let text = content.replace(/^(以下是|根据|从《.*?》中找到的相关原文[:：]?|相关原文[:：]?)/i, '');
   
-  // 移除编号（如"1. "、"2. "、"一、"、"二、"等）
+  // 移除编号（如"1. "、"2. "、"一、"、"二、"等）- 包括开头和文本中间的编号
   text = text.replace(/^\d+[.、]\s*/gm, '');
   text = text.replace(/^[一二三四五六七八九十][、.]\s*/gm, '');
+  // 移除文本中间的编号（如"1，"、"2，"、"1."、"2."等）
+  text = text.replace(/\d+[，,.]\s*/g, '');
+  text = text.replace(/[一二三四五六七八九十][，,.]\s*/g, '');
   
   // 移除出处信息（如"——《韩非子·难二》"、"出自《韩非子》"等）
   text = text.replace(/——《.*?》.*?$/gm, '');
