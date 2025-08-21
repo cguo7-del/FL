@@ -1,1 +1,1 @@
-{"/_app":"pages/_app.js","/api/deepseek":"pages/api/deepseek.js","/_error":"pages/_error.js","/answer":"pages/answer.html","/ask":"pages/ask.html","/":"pages/index.html","/test-db":"pages/test-db.html","/_document":"pages/_document.js","/404":"pages/404.html"}
+{"/_app":"pages/_app.js","/_error":"pages/_error.js","/answer":"pages/answer.html","/api/deepseek":"pages/api/deepseek.js","/api/search-quotes":"pages/api/search-quotes.js","/":"pages/index.html","/ask":"pages/ask.html","/test-db":"pages/test-db.html","/_document":"pages/_document.js","/404":"pages/404.html"}
