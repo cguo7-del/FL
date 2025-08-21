@@ -292,6 +292,12 @@ function extractOriginalText(content, bookName) {
   text = text.replace(/（《.*?》）/g, '');
   text = text.replace(/\(《.*?》\)/g, '');
   
+  // 移除书名信息，避免在source中重复显示书名
+  if (bookName) {
+    const bookNameRegex = new RegExp(`《?${bookName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}》?[·\s]*`, 'gi');
+    text = text.replace(bookNameRegex, '');
+  }
+  
   // 移除引号
   text = text.replace(/^[""'']|[""'']$/g, '');
   

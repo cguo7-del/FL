@@ -264,6 +264,12 @@ function extractOriginalText(content, bookName) {
   text = text.replace(/此句[^。]*。?/g, '').replace(/这句话[^。]*。?/g, '');
   text = text.replace(/出自[^。]*。?/g, '').replace(/来源[^。]*。?/g, '');
   
+  // 移除书名信息，避免在source中重复显示书名
+  if (bookName) {
+    const bookNameRegex = new RegExp(`《?${bookName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}》?[·\s]*`, 'gi');
+    text = text.replace(bookNameRegex, '');
+  }
+  
   // 查找纯净的古文句子
   const sentences = text.split(/[。！？；]/).filter(s => s.length > 5 && s.length < 50);
   
