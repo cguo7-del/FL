@@ -1,7 +1,49 @@
+import React, { useState, useEffect } from 'react'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import styles from '../styles/Home.module.css'
+import { authOperations } from '../lib/supabase'
 
 export default function Home() {
+  const router = useRouter()
+  const [user, setUser] = useState(null)
+  const [showDropdown, setShowDropdown] = useState(false)
+  
+  // 检查用户登录状态
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const currentUser = await authOperations.getCurrentUser()
+        setUser(currentUser)
+      } catch (error) {
+        setUser(null)
+      }
+    }
+    
+    checkUser()
+    
+    // 监听认证状态变化
+    const { data: { subscription } } = authOperations.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        setUser(session?.user || null)
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null)
+      }
+    })
+    
+    return () => subscription.unsubscribe()
+  }, [])
+  
+  // 处理登出
+  const handleSignOut = async () => {
+    try {
+      await authOperations.signOut()
+      setShowDropdown(false)
+    } catch (error) {
+      console.error('登出错误:', error)
+    }
+  }
+
   return (
     <>
       <Head>
@@ -16,7 +58,54 @@ export default function Home() {
         <nav className={styles.navbar}>
           <div className={styles.brand}>方略 Fanglue</div>
           <div className={styles.navLinks}>
-            <button className={styles.authBtn}>注册/登录</button>
+            {user ? (
+              <div className={styles.userMenu}>
+                <button 
+                  className={styles.userButton}
+                  onClick={() => setShowDropdown(!showDropdown)}
+                >
+                  {user.user_metadata?.username || user.email}
+                  <span className={styles.dropdownArrow}>▼</span>
+                </button>
+                {showDropdown && (
+                  <div className={styles.dropdown}>
+                    <button 
+                      className={styles.dropdownItem}
+                      onClick={() => {
+                        setShowDropdown(false)
+                        // TODO: 跳转到个人资料页面
+                        alert('个人资料功能即将上线')
+                      }}
+                    >
+                      个人资料详情
+                    </button>
+                    <button 
+                      className={styles.dropdownItem}
+                      onClick={() => {
+                        setShowDropdown(false)
+                        router.push('/collection')
+                      }}
+                    >
+                      历问历答
+                    </button>
+                    <hr className={styles.dropdownDivider} />
+                    <button 
+                      className={styles.dropdownItem}
+                      onClick={handleSignOut}
+                    >
+                      退出登录
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button 
+                className={styles.authBtn}
+                onClick={() => router.push('/auth')}
+              >
+                注册/登录
+              </button>
+            )}
           </div>
         </nav>
 
@@ -64,7 +153,7 @@ export default function Home() {
           <div className={styles.footerButtons}>
             <a href="#" className={styles.footerBtn} title="功能开发中，敬请期待">众议百解</a>
             <a href="#" className={styles.footerBtn} title="功能开发中，敬请期待">一日一策</a>
-            <a href="#" className={styles.footerBtn} title="功能开发中，敬请期待">历问历答</a>
+            <a href="/collection" className={styles.footerBtn}>历问历答</a>
           </div>
         </footer>
       </div>

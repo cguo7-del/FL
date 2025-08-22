@@ -46,19 +46,119 @@
 }
 
 .authBtn {
-  padding: 8px 20px;
-  border: 1px solid #ddd;
-  background-color: #fff;
-  color: #666;
-  text-decoration: none;
-  border-radius: 4px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
   transition: all 0.3s ease;
-  font-size: 16px;
 }
 
 .authBtn:hover {
-  background-color: #f5f5f5;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* 用户菜单样式 */
+.userMenu {
+  position: relative;
+  display: inline-block;
+}
+
+.userButton {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.userButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.dropdownArrow {
+  font-size: 10px;
+  transition: transform 0.3s ease;
+}
+
+.userButton:hover .dropdownArrow {
+  transform: rotate(180deg);
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 180px;
+  z-index: 1000;
+  margin-top: 8px;
+  animation: dropdownFadeIn 0.2s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownItem {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: background-color 0.2s ease;
+}
+
+.dropdownItem:hover {
+  background-color: #f8f9fa;
+}
+
+.dropdownItem:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+.dropdownItem:last-child {
+  border-radius: 0 0 8px 8px;
+  color: #dc3545;
+}
+
+.dropdownItem:last-child:hover {
+  background-color: #f8d7da;
+}
+
+.dropdownDivider {
+  margin: 0;
+  border: none;
+  border-top: 1px solid #e1e5e9;
 }
 
 .mainContent {
@@ -435,5 +535,82 @@
   .navLinks {
     flex-direction: column;
     gap: 0.5rem;
+  }
+}
+
+/* 操作按钮样式 */
+.actionButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  padding: 1rem;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 12px 24px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.actionBtn:hover {
+  background-color: #f5f5f5;
+  border-color: #bbb;
+}
+
+.actionBtn.collected {
+  background-color: #d4a574 !important;
+  color: white !important;
+  border-color: #d4a574 !important;
+}
+
+.actionBtn.collected:hover {
+  background-color: #c19660 !important;
+  border-color: #c19660 !important;
+}
+
+.actionBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.actionIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .actionButtons {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .actionBtn {
+    flex: 1;
+    min-width: calc(50% - 0.25rem);
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .actionButtons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .actionBtn {
+    width: 100%;
+    justify-content: center;
   }
 }

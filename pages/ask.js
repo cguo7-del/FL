@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
 import styles from '../styles/Ask.module.css'
-import { dbOperations } from '../lib/supabase'
+import { dbOperations, authOperations } from '../lib/supabase'
 
 export default function Ask() {
+  const router = useRouter()
   const [question, setQuestion] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [answer, setAnswer] = useState('')
   const [connectionStatus, setConnectionStatus] = useState('未连接')
   const [selectedStrategies, setSelectedStrategies] = useState([])
   const [strategyOptions, setStrategyOptions] = useState([])
+  const [user, setUser] = useState(null)
+  const [showDropdown, setShowDropdown] = useState(false)
 
   // 测试数据库连接和获取策略选项
   useEffect(() => {
@@ -63,6 +68,31 @@ export default function Ask() {
     testConnection()
     fetchStrategyOptions()
   }, [])
+  
+  // 检查用户登录状态
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const currentUser = await authOperations.getCurrentUser()
+        setUser(currentUser)
+      } catch (error) {
+        setUser(null)
+      }
+    }
+    
+    checkUser()
+    
+    // 监听认证状态变化
+    const { data: { subscription } } = authOperations.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        setUser(session?.user || null)
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null)
+      }
+    })
+    
+    return () => subscription.unsubscribe()
+  }, [])
 
   // 处理方略经纬选择
   const handleStrategyChange = (strategyId) => {
@@ -75,6 +105,16 @@ export default function Ask() {
     })
   }
 
+  // 处理登出
+  const handleSignOut = async () => {
+    try {
+      await authOperations.signOut()
+      setShowDropdown(false)
+    } catch (error) {
+      console.error('登出错误:', error)
+    }
+  }
+  
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!question.trim()) return
@@ -101,7 +141,48 @@ export default function Ask() {
       <nav className={styles.navbar}>
         <div className={styles.brand} onClick={() => window.location.href = '/'} style={{cursor: 'pointer'}}>方略 Fanglue</div>
         <div className={styles.navLinks}>
-          <button className={styles.authBtn}>注册/登录</button>
+          {user ? (
+            <div className={styles.userMenu}>
+              <button 
+                className={styles.userButton}
+                onClick={() => setShowDropdown(!showDropdown)}
+              >
+                {user.user_metadata?.username || user.email}
+                <span className={styles.dropdownArrow}>▼</span>
+              </button>
+              {showDropdown && (
+                <div className={styles.dropdown}>
+                  <button 
+                    className={styles.dropdownItem}
+                    onClick={() => {
+                      setShowDropdown(false)
+                      alert('个人资料功能即将上线')
+                    }}
+                  >
+                    个人资料详情
+                  </button>
+                  <button 
+                    className={styles.dropdownItem}
+                    onClick={() => {
+                      setShowDropdown(false)
+                      alert('历史问答功能即将上线')
+                    }}
+                  >
+                    历史问答
+                  </button>
+                  <hr className={styles.dropdownDivider} />
+                  <button 
+                    className={styles.dropdownItem}
+                    onClick={handleSignOut}
+                  >
+                    退出登录
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button className={styles.authBtn} onClick={() => router.push('/auth')}>注册/登录</button>
+          )}
         </div>
       </nav>
 

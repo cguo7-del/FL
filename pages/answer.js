@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import styles from '../styles/Answer.module.css'
-import { dbOperations } from '../lib/supabase'
+import { dbOperations, authOperations, collectionOperations } from '../lib/supabase'
 
 export default function Answer() {
   const router = useRouter()
@@ -10,6 +10,10 @@ export default function Answer() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [loadingProgress, setLoadingProgress] = useState(0)
+  const [user, setUser] = useState(null)
+  const [showDropdown, setShowDropdown] = useState(false)
+  const [isCollected, setIsCollected] = useState(false)
+  const [isCollecting, setIsCollecting] = useState(false)
 
   useEffect(() => {
     if (question) {
@@ -33,6 +37,109 @@ export default function Answer() {
       return () => clearInterval(progressInterval)
      }
    }, [question])
+
+  // 检查用户登录状态
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const currentUser = await authOperations.getCurrentUser()
+        setUser(currentUser)
+      } catch (error) {
+        setUser(null)
+      }
+    }
+    
+    checkUser()
+    
+    // 监听认证状态变化
+    const { data: { subscription } } = authOperations.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        setUser(session?.user || null)
+        // 用户登录后检查收藏状态
+        if (answer) {
+          setTimeout(() => checkCollectionStatus(), 500)
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null)
+        setIsCollected(false)
+      }
+    })
+    
+    return () => subscription.unsubscribe()
+  }, [])
+
+  // 处理登出
+  const handleSignOut = async () => {
+    try {
+      await authOperations.signOut()
+      setShowDropdown(false)
+    } catch (error) {
+      console.error('登出错误:', error)
+    }
+  }
+
+  // 检查收藏状态
+  const checkCollectionStatus = async () => {
+    if (!user || !answer) return
+    
+    try {
+      const collected = await collectionOperations.checkIfCollected(
+        user.id,
+        question,
+        answer.探源.原文
+      )
+      setIsCollected(collected)
+    } catch (error) {
+      console.error('检查收藏状态失败:', error)
+    }
+  }
+
+  // 处理收藏/取消收藏
+  const handleCollection = async () => {
+    if (!user) {
+      alert('请先登录后再收藏')
+      router.push('/auth')
+      return
+    }
+
+    if (!answer) return
+
+    setIsCollecting(true)
+    try {
+      if (isCollected) {
+        // 取消收藏 - 需要先找到收藏记录的ID
+        const collectionsResult = await collectionOperations.getUserCollections(user.id)
+        const targetCollection = collectionsResult.data.find(c => {
+          if (c.question !== question) return false
+          try {
+            const savedAnswer = JSON.parse(c.answer)
+            return savedAnswer.探源 && savedAnswer.探源.原文 === answer.探源.原文
+          } catch (error) {
+            // 兼容旧格式
+            return c.answer.includes(answer.探源.原文)
+          }
+        })
+        
+        if (targetCollection) {
+          await collectionOperations.deleteCollections([targetCollection.id])
+          setIsCollected(false)
+          alert('已取消收藏')
+        }
+      } else {
+        // 添加收藏 - 保存完整的答案对象
+        const fullAnswer = JSON.stringify(answer)
+        
+        await collectionOperations.saveCollection(user.id, question, fullAnswer)
+        setIsCollected(true)
+        alert('收藏成功！')
+      }
+    } catch (error) {
+      console.error('收藏操作失败:', error)
+      alert('操作失败，请重试')
+    } finally {
+      setIsCollecting(false)
+    }
+  }
 
   const generateAnswer = async () => {
     setIsLoading(true)
@@ -75,9 +182,15 @@ export default function Answer() {
       const structuredAnswer = await generateStructuredAnswer(question, books, selectedStrategies)
       
       setAnswer(structuredAnswer)
+      
+      // 重置收藏状态为未收藏，不再自动检查收藏状态
+      // 这样确保每次重新生成答案时都是未收藏状态
+      setIsCollected(false)
     } catch (error) {
       console.error('生成答案失败:', error)
       setError('生成答案时出现错误，请稍后重试。')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -684,7 +797,48 @@ const generateLocalIntelligentContent = (prompt) => {
       <nav className={styles.navbar}>
         <div className={styles.brand} onClick={() => router.push('/')} style={{cursor: 'pointer'}}>方略 Fanglue</div>
         <div className={styles.navLinks}>
-          <button className={styles.authBtn}>注册/登录</button>
+          {user ? (
+            <div className={styles.userMenu}>
+              <button 
+                className={styles.userButton}
+                onClick={() => setShowDropdown(!showDropdown)}
+              >
+                {user.user_metadata?.username || user.email}
+                <span className={styles.dropdownArrow}>▼</span>
+              </button>
+              {showDropdown && (
+                <div className={styles.dropdown}>
+                  <button 
+                    className={styles.dropdownItem}
+                    onClick={() => {
+                      setShowDropdown(false)
+                      alert('个人资料功能即将上线')
+                    }}
+                  >
+                    个人资料详情
+                  </button>
+                  <button 
+                    className={styles.dropdownItem}
+                    onClick={() => {
+                      setShowDropdown(false)
+                      router.push('/collection')
+                    }}
+                  >
+                    历问历答
+                  </button>
+                  <hr className={styles.dropdownDivider} />
+                  <button 
+                    className={styles.dropdownItem}
+                    onClick={handleSignOut}
+                  >
+                    退出登录
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button className={styles.authBtn} onClick={() => router.push('/auth')}>注册/登录</button>
+          )}
         </div>
       </nav>
 
@@ -739,6 +893,63 @@ const generateLocalIntelligentContent = (prompt) => {
             </section>
           </article>
         )}
+
+        {/* 操作按钮区域 */}
+        {answer && (
+          <div className={styles.actionButtons}>
+            <button className={styles.actionBtn} onClick={() => {
+              // 重置状态并启动进度条动画
+              setAnswer(null)
+              setIsLoading(true)
+              setLoadingProgress(0)
+              
+              // 启动进度条动画
+              const progressInterval = setInterval(() => {
+                setLoadingProgress(prev => {
+                  if (prev >= 90) return prev // 最多到90%，等API完成
+                  return prev + 1
+                })
+              }, 100) // 每100ms增加1%
+              
+              generateAnswer().finally(() => {
+                // API完成后，快速完成进度条
+                clearInterval(progressInterval)
+                setLoadingProgress(100)
+                setTimeout(() => {
+                  setIsLoading(false)
+                }, 200) // 让用户看到100%
+              })
+            }}>
+              <img src="/icons/refresh.svg" alt="重新生成" className={styles.actionIcon} />
+              重新生成答案
+            </button>
+            <button className={styles.actionBtn} onClick={() => router.push('/ask')}>
+              <img src="/icons/question.svg" alt="提问" className={styles.actionIcon} />
+              提出新问题
+            </button>
+            <button 
+              className={`${styles.actionBtn} ${isCollected ? styles.collected : ''}`}
+              onClick={handleCollection}
+              disabled={isCollecting}
+              style={{
+                backgroundColor: isCollected ? '#d4a574' : '#fff',
+                color: isCollected ? '#fff' : '#666',
+                borderColor: isCollected ? '#d4a574' : '#ddd'
+              }}
+            >
+              <img 
+                src={isCollected ? "/icons/heart-filled.svg" : "/icons/heart.svg"} 
+                alt={isCollected ? "已收藏" : "收藏"} 
+                className={styles.actionIcon} 
+              />
+              {isCollecting ? '处理中...' : (isCollected ? '已收藏' : '收藏此策')}
+            </button>
+            <button className={styles.actionBtn} onClick={() => window.print()}>
+              <img src="/icons/print.svg" alt="打印" className={styles.actionIcon} />
+              打印保存
+            </button>
+          </div>
+        )}
       </main>
 
       {/* 底部区域 */}
@@ -747,7 +958,7 @@ const generateLocalIntelligentContent = (prompt) => {
         <div className={styles.footerButtons}>
           <a href="#" className={styles.footerBtn} title="功能开发中，敬请期待">众议百解</a>
           <a href="#" className={styles.footerBtn} title="功能开发中，敬请期待">一日一策</a>
-          <a href="#" className={styles.footerBtn} title="功能开发中，敬请期待">历问历答</a>
+          <a href="/collection" className={styles.footerBtn}>历问历答</a>
         </div>
       </footer>
     </div>

@@ -270,6 +270,19 @@ function extractOriginalText(content, bookName) {
     text = text.replace(bookNameRegex, '');
   }
   
+  // 移除章节名前缀（如"垦令》："、"兵法》："等）
+  text = text.replace(/.*?》："/g, '');
+  text = text.replace(/.*?】："/g, '');
+  text = text.replace(/.*?〉："/g, '');
+  text = text.replace(/.*?》：/g, '');
+  text = text.replace(/.*?】：/g, '');
+  text = text.replace(/.*?〉：/g, '');
+  
+  // 移除其他常见的章节标识符和引号
+  text = text.replace(/^[^：]*：/gm, '');
+  text = text.replace(/^"/g, '').replace(/"$/g, '');
+  text = text.replace(/^'/g, '').replace(/'$/g, '');
+  
   // 查找纯净的古文句子
   const sentences = text.split(/[。！？；]/).filter(s => s.length > 5 && s.length < 50);
   
