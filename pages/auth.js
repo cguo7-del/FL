@@ -210,7 +210,7 @@ export default function Auth() {
     setMessage('')
 
     try {
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fanglue.org'
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -295,9 +295,7 @@ export default function Auth() {
     setMessage('')
 
     try {
-      const redirectTo = process.env.NEXT_PUBLIC_SITE_URL 
-        ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth?type=recovery`
-        : `${window.location.origin}/auth?type=recovery`
+      const redirectTo = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://fanglue.org'}/auth?type=recovery`
 
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
         redirectTo

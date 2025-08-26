@@ -164,9 +164,7 @@ export default function Profile() {
     setMessage('')
 
     try {
-      const redirectTo = process.env.NEXT_PUBLIC_SITE_URL 
-        ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth?type=recovery`
-        : `${window.location.origin}/auth?type=recovery`
+      const redirectTo = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://fanglue.org'}/auth?type=recovery`
 
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
         redirectTo
