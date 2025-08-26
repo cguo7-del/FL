@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>方略 Fanglue</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* 顶部导航栏 */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .brand {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .auth-btn {
+            padding: 8px 20px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            color: #666;
+            text-decoration: none;
+            border-radius: 4px;
+            cursor: not-allowed;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .auth-btn:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            text-align: center;
+            padding: 80px 20px;
+            background-color: #fff;
+        }
+
+        /* 主标题区域 */
+        .main-title {
+            margin-bottom: 30px;
+        }
+
+        .title-line {
+            font-size: 48px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+        }
+
+        /* 核心功能按钮 */
+        .main-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background-color: #d4a574;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 80px;
+            transition: all 0.3s ease;
+        }
+
+        .main-button:hover {
+            background-color: #c19660;
+            transform: translateY(-2px);
+        }
+
+        /* 功能模块展示 */
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+            margin-bottom: 80px;
+            flex-wrap: wrap;
+        }
+
+        .feature-item {
+            text-align: center;
+            max-width: 200px;
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background-color: #f0f0f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: #2c3e50;
+        }
+
+        .feature-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        /* 底部区域 */
+        .footer-section {
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .footer-title {
+            font-size: 24px;
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+        }
+
+        .footer-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .footer-btn {
+            padding: 12px 30px;
+            background-color: transparent;
+            color: #fff;
+            border: 2px solid #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: not-allowed;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .footer-btn:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+            
+            .brand {
+                font-size: 24px;
+            }
+            
+            .title-line {
+                font-size: 36px;
+            }
+            
+            .features {
+                gap: 40px;
+            }
+            
+            .footer-buttons {
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <div class="brand">方略 Fanglue</div>
+        <div class="auth-buttons">
+            <a href="#" class="auth-btn" title="功能开发中，敬请期待">登录</a>
+            <a href="#" class="auth-btn" title="功能开发中，敬请期待">注册</a>
+        </div>
+    </nav>
+
+    <!-- 主内容区域 -->
+    <main class="main-content">
+        <!-- 主标题区域 -->
+        <div class="main-title">
+            <div class="title-line">三十息，问古今</div>
+            <div class="title-line">千年略，解一念</div>
+            <div class="subtitle">从经史到兵法，古智与算法，同答一问</div>
+        </div>
+
+        <!-- 核心功能按钮 -->
+        <a href="#" class="main-button">立即寻索</a>
+
+        <!-- 功能模块展示 -->
+        <div class="features">
+            <div class="feature-item">
+                <div class="feature-icon">📜</div>
+                <div class="feature-title">探源</div>
+                <div class="feature-desc">溯古问道<br>择智珠以为引</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🔍</div>
+                <div class="feature-title">析局</div>
+                <div class="feature-desc">洞察机枢<br>见万变之本脉</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">📈</div>
+                <div class="feature-title">行策</div>
+                <div class="feature-desc">授你谋纲<br>行于九地八方</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部区域 -->
+    <footer class="footer-section">
+        <div class="footer-title">让千载经略，为你今日一策</div>
+        <div class="footer-buttons">
+            <a href="#" class="footer-btn" title="功能开发中，敬请期待">众议百解</a>
+            <a href="#" class="footer-btn" title="功能开发中，敬请期待">一日一策</a>
+            <a href="#" class="footer-btn" title="功能开发中，敬请期待">历问历答</a>
+        </div>
+    </footer>
+</body>
+</html>
