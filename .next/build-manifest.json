@@ -27,15 +27,20 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
+    "/answer": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/answer.js"
+    ],
     "/ask": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
       "static/chunks/pages/ask.js"
     ],
-    "/auth": [
+    "/collection": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/auth.js"
+      "static/chunks/pages/collection.js"
     ]
   },
   "ampFirstPages": []

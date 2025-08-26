@@ -428,10 +428,10 @@ export default function Collection() {
                       className={styles.dropdownItem}
                       onClick={() => {
                         setShowDropdown(false)
-                        alert('个人资料功能即将上线')
+                        router.push('/profile')
                       }}
                     >
-                      个人资料详情
+                      个人资料
                     </button>
                     <button 
                       className={styles.dropdownItem}
@@ -496,9 +496,13 @@ export default function Collection() {
           {/* 收藏列表 */}
           {collections.length === 0 ? (
             <div className={styles.emptyState}>
-              <div className={styles.emptyIcon}>📚</div>
+              <div className={styles.emptyIcon}>
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 19.5C4 18.837 4.263 18.201 4.732 17.732C5.201 17.263 5.837 17 6.5 17H20" stroke="#d4a574" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M6.5 2H20V22H6.5C5.837 22 5.201 21.737 4.732 21.268C4.263 20.799 4 20.163 4 19.5V4.5C4 3.837 4.263 3.201 4.732 2.732C5.201 2.263 5.837 2 6.5 2Z" stroke="#d4a574" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
               <div className={styles.emptyTitle}>暂无收藏</div>
-              <div className={styles.emptyDesc}>去探索更多智慧，收藏您感兴趣的问答吧</div>
               <button 
                 className={styles.mainButton}
                 onClick={() => router.push('/ask')}

@@ -224,10 +224,10 @@ export default function Answer() {
     
     const getBookSource = (quoteData) => {
       if (!quoteData || !quoteData.bookName) {
-        return "《古代典籍·第一章》"
+        return "古代典籍·第一章"
       }
-      // 显示书籍名称和章节名称
-      return `《${quoteData.bookName}·${quoteData.chapterName || '经典篇章'}》`
+      // 显示书籍名称和章节名称，不添加书名号
+      return `${quoteData.bookName}·${quoteData.chapterName || '经典篇章'}`
     }
     
     // 调用大语言模型生成答案内容
@@ -691,7 +691,8 @@ const generateLocalIntelligentContent = (prompt) => {
 4. 基于原文智慧和逻辑分析
 5. 控制在200-300字
 6. 直接给出具体方法，不要包含任何改写说明、格式说明或元描述
-7. 参考示例风格："你可以笑着抛个球：'这个项目牵涉到好几个部门，您帮我们定个方向吧。'老板一听，自然就站到台前成了'项目主人'。之后每次开关键会议，你都先请他开场定调，而你在一旁安静记录细节、补位执行——这样，大家心里都默认，他是最终拍板的人。在项目推进的过程中，任何一点风险，你都第一时间写成邮件或会议纪要抄送老板，让证据落在纸面上，也给自己留条后路。与此同时，你还可以刻意创造一些可见的小成绩——比如提前交付一个阶段成果、或者悄悄解决一个老大难问题——让大家记住你的价值，但不要抢风头，也不要急着当"全能救世主"。"`;
+7. 开头要自然多样化，避免重复使用"想象一下"，可以用"你可以"、"不妨"、"关键在于"、"首先"、"最好的做法是"等多种开头方式
+8. 参考示例风格："你可以笑着抛个球：'这个项目牵涉到好几个部门，您帮我们定个方向吧。'老板一听，自然就站到台前成了'项目主人'。之后每次开关键会议，你都先请他开场定调，而你在一旁安静记录细节、补位执行——这样，大家心里都默认，他是最终拍板的人。在项目推进的过程中，任何一点风险，你都第一时间写成邮件或会议纪要抄送老板，让证据落在纸面上，也给自己留条后路。与此同时，你还可以刻意创造一些可见的小成绩——比如提前交付一个阶段成果、或者悄悄解决一个老大难问题——让大家记住你的价值，但不要抢风头，也不要急着当"全能救世主"。"`;
     
     const detailedMethod = await callDeepSeekAPI(methodPrompt);
     return detailedMethod || `你可以先主动找对方沟通，了解真实想法和顾虑。在交流过程中，保持开放的心态，认真倾听对方的观点。然后寻找双方的共同利益点，从这个角度提出解决方案。同时，你要展现出诚意和耐心，让对方感受到你的善意。关键在于以诚待人，以理服人。`;
@@ -812,10 +813,10 @@ const generateLocalIntelligentContent = (prompt) => {
                     className={styles.dropdownItem}
                     onClick={() => {
                       setShowDropdown(false)
-                      alert('个人资料功能即将上线')
+                      router.push('/profile')
                     }}
                   >
-                    个人资料详情
+                    个人资料
                   </button>
                   <button 
                     className={styles.dropdownItem}

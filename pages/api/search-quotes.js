@@ -257,7 +257,7 @@ function extractOriginalText(content, bookName) {
   let text = content.replace(/<[^>]*>/g, '').trim();
   
   // 移除数字序号（如"1. "、"2. "等）
-  text = text.replace(/^\d+\.\s*/gm, '');
+  text = text.replace(/^\d+[.、]\s*/gm, '');
   
   // 移除解释性文字和括号内容
   text = text.replace(/\([^)]*\)/g, '').replace(/（[^）]*）/g, '');
@@ -278,10 +278,17 @@ function extractOriginalText(content, bookName) {
   text = text.replace(/.*?】：/g, '');
   text = text.replace(/.*?〉：/g, '');
   
-  // 移除其他常见的章节标识符和引号
+  // 移除冒号前的所有内容（包括策略名称等）
   text = text.replace(/^[^：]*：/gm, '');
-  text = text.replace(/^"/g, '').replace(/"$/g, '');
-  text = text.replace(/^'/g, '').replace(/'$/g, '');
+  
+  // 移除引号和书名号
+  text = text.replace(/[""''「」『』《》]/g, '');
+  
+  // 移除重复的引号（如开头的""）
+  text = text.replace(/^[""'']+/g, '').replace(/[""'']+$/g, '');
+  
+  // 移除其他可能的前缀标识
+  text = text.replace(/^[\s]*[-—•·]\s*/gm, '');
   
   // 查找纯净的古文句子
   const sentences = text.split(/[。！？；]/).filter(s => s.length > 5 && s.length < 50);

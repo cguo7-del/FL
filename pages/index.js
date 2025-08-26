@@ -73,11 +73,10 @@ export default function Home() {
                       className={styles.dropdownItem}
                       onClick={() => {
                         setShowDropdown(false)
-                        // TODO: 跳转到个人资料页面
-                        alert('个人资料功能即将上线')
+                        router.push('/profile')
                       }}
                     >
-                      个人资料详情
+                      个人资料
                     </button>
                     <button 
                       className={styles.dropdownItem}

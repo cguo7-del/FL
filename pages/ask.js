@@ -156,19 +156,19 @@ export default function Ask() {
                     className={styles.dropdownItem}
                     onClick={() => {
                       setShowDropdown(false)
-                      alert('个人资料功能即将上线')
+                      router.push('/profile')
                     }}
                   >
-                    个人资料详情
+                    个人资料
                   </button>
                   <button 
                     className={styles.dropdownItem}
                     onClick={() => {
                       setShowDropdown(false)
-                      alert('历史问答功能即将上线')
+                      router.push('/collection')
                     }}
                   >
-                    历史问答
+                    历问历答
                   </button>
                   <hr className={styles.dropdownDivider} />
                   <button 
@@ -258,7 +258,7 @@ export default function Ask() {
         <div className={styles.footerButtons}>
           <a href="#" className={styles.footerBtn} title="功能开发中，敬请期待">众议百解</a>
           <a href="#" className={styles.footerBtn} title="功能开发中，敬请期待">一日一策</a>
-          <a href="#" className={styles.footerBtn} title="功能开发中，敬请期待">历问历答</a>
+          <a href="/collection" className={styles.footerBtn}>历问历答</a>
         </div>
       </footer>
     </div>

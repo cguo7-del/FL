@@ -4,117 +4,204 @@ import Head from 'next/head'
 import styles from '../styles/Auth.module.css'
 import { supabase, authOperations, localizeSupabaseError } from '../lib/supabase'
 
+// 忘记密码模态框组件
+const ForgotPasswordModal = ({ 
+  showForgotPassword, 
+  resetEmail, 
+  isLoading, 
+  onClose, 
+  onSubmit, 
+  onEmailChange 
+}) => {
+  if (!showForgotPassword) return null
+  
+  return (
+    <div className={styles.modal}>
+      <div className={styles.modalContent}>
+        <div className={styles.modalHeader}>
+          <h3>重置密码</h3>
+          <button 
+            className={styles.closeButton}
+            onClick={onClose}
+          >
+            ×
+          </button>
+        </div>
+        <form onSubmit={onSubmit} className={styles.forgotPasswordForm}>
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>邮箱地址</label>
+            <input
+              type="email"
+              value={resetEmail}
+              onChange={onEmailChange}
+              className={styles.input}
+              placeholder="请输入您的邮箱地址"
+              required
+              disabled={isLoading}
+            />
+          </div>
+          <div className={styles.modalButtons}>
+            <button 
+              type="button" 
+              className={styles.cancelButton}
+              onClick={onClose}
+              disabled={isLoading}
+            >
+              取消
+            </button>
+            <button 
+              type="submit" 
+              className={styles.submitButton}
+              disabled={isLoading || !resetEmail}
+            >
+              {isLoading ? '发送中...' : '发送重置邮件'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 export default function Auth() {
   const router = useRouter()
   const [isLogin, setIsLogin] = useState(true)
-  const [formData, setFormData] = useState({
-    email: '',
-    username: '',
-    password: '',
-    confirmPassword: ''
-  })
-  const [errors, setErrors] = useState({})
+  const [isPasswordReset, setIsPasswordReset] = useState(false)
+  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmNewPassword, setConfirmNewPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState('')
-  const [user, setUser] = useState(null)
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [resetEmail, setResetEmail] = useState('')
 
-  // 检查用户登录状态
   useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const user = await authOperations.getCurrentUser()
-        setUser(user)
-        if (user) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state change:', event, session)
+      
+      if (event === 'SIGNED_IN') {
+        const { type } = router.query
+        
+        if (type === 'recovery') {
+          // 密码重置流程，显示重置密码表单
+          setIsPasswordReset(true)
+          setMessage('')
+          return
+        }
+        
+        if (type === 'signup') {
+          // 邮箱验证成功，直接跳转到首页
+          setMessage('邮箱验证成功！欢迎使用！')
+          router.push('/')
+          return
+        }
+        
+        // 正常登录，跳转到首页
+        if (!isPasswordReset) {
           router.push('/')
         }
-      } catch (error) {
-        // 用户未登录，继续显示登录页面
-        console.log('用户未登录')
       }
-    }
-    checkUser()
-
-    // 监听认证状态变化
-    const { data: { subscription } } = authOperations.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN') {
-        setUser(session?.user || null)
-        router.push('/')
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null)
+      
+      if (event === 'PASSWORD_RECOVERY') {
+        // 密码重置会话
+        setIsPasswordReset(true)
+        setMessage('')
+      }
+      
+      if (event === 'SIGNED_OUT') {
+        // 用户登出时，确保重置所有状态
+        setIsPasswordReset(false)
+        setMessage('')
       }
     })
 
-    return () => subscription.unsubscribe()
-  }, [])
-
-  // 表单验证函数
-  const validateForm = () => {
-    const newErrors = {}
-
-    // 邮箱验证
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!formData.email) {
-      newErrors.email = '请输入邮箱地址'
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = '请检查邮箱格式'
+    // 检查URL参数
+    const { type } = router.query
+    if (type === 'recovery') {
+      setIsPasswordReset(true)
+    } else {
+      // 如果没有 recovery 参数，确保不显示密码重置界面
+      setIsPasswordReset(false)
     }
 
+    return () => subscription.unsubscribe()
+  }, [router.query, isPasswordReset])
+
+  // 实时输入处理
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value)
+    setMessage('')
+  }
+
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value)
+    setMessage('')
+  }
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value)
+    setMessage('')
+  }
+
+  const handleConfirmPasswordChange = (e) => {
+    setConfirmPassword(e.target.value)
+    setMessage('')
+  }
+
+  const handleResetEmailChange = (e) => {
+    setResetEmail(e.target.value)
+    setMessage('')
+  }
+
+  const handleCloseForgotPassword = () => {
+    setShowForgotPassword(false)
+    setResetEmail('')
+    setMessage('')
+  }
+
+  // 表单验证
+  const validateForm = () => {
+    // 邮箱格式验证
+    if (!validateEmail(email)) {
+      setMessage('请检查邮箱格式')
+      return false
+    }
+    
+    // 注册时的额外验证
     if (!isLogin) {
-      // 用户名验证（仅注册时）
-      if (!formData.username) {
-        newErrors.username = '请输入用户名'
-      } else if (formData.username.length < 3) {
-        newErrors.username = '用户名至少需要3个字符'
+      // 用户名验证
+      if (username.length < 3) {
+        setMessage('用户名至少需要3个字符')
+        return false
       }
-
-      // 密码验证（注册时更严格）
-      if (!formData.password) {
-        newErrors.password = '请输入密码'
-      } else {
-        const password = formData.password
-        const hasNumber = /\d/.test(password)
-        const hasLetter = /[a-zA-Z]/.test(password)
-        const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password)
-        
-        if (password.length < 8) {
-          newErrors.password = '密码至少需要8位字符'
-        } else if (!hasNumber) {
-          newErrors.password = '密码必须包含数字'
-        } else if (!hasLetter) {
-          newErrors.password = '密码必须包含字母'
-        } else if (!hasSpecial) {
-          newErrors.password = '密码必须包含特殊符号'
-        }
+      
+      // 密码复杂度验证
+      const passwordValidation = validatePassword(password)
+      if (!passwordValidation.isValid) {
+        setMessage('请输入正确格式的密码')
+        return false
       }
-
-      // 确认密码验证
-      if (!formData.confirmPassword) {
-        newErrors.confirmPassword = '请确认密码'
-      } else if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = '两次输入的密码不一致'
+      
+      // 密码一致性验证
+      if (password !== confirmPassword) {
+        setMessage('两次输入的密码不一致')
+        return false
       }
     } else {
-      // 登录时密码验证（较宽松）
-      if (!formData.password) {
-        newErrors.password = '请输入密码'
+      // 登录时的密码验证
+      if (password.length < 8) {
+        setMessage('密码至少需要8位字符')
+        return false
       }
     }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  // 实时验证
-  const handleInputChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
     
-    // 清除该字段的错误信息
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }))
-    }
+    return true
   }
 
-  // 处理注册
+  // 注册处理
   const handleSignUp = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
@@ -123,56 +210,176 @@ export default function Auth() {
     setMessage('')
 
     try {
-      const data = await authOperations.signUp(
-        formData.email, 
-        formData.password, 
-        formData.username
-      )
-      
-      setMessage('注册成功！请检查您的邮箱并点击验证链接完成注册。')
-      // 清空表单
-      setFormData({
-        email: '',
-        username: '',
-        password: '',
-        confirmPassword: ''
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username: username
+          },
+          emailRedirectTo: `${siteUrl}/auth?type=signup`
+        }
       })
+
+      if (error) {
+        console.error('注册错误:', error)
+        setMessage(localizeSupabaseError(error))
+      } else {
+        setMessage('注册成功！请检查您的邮箱以验证账户。')
+      }
     } catch (error) {
-      console.error('注册错误:', error)
-      setMessage(error.message)
+      console.error('注册异常:', error)
+      setMessage(localizeSupabaseError(error) || '注册失败，请稍后重试')
     } finally {
       setIsLoading(false)
     }
   }
 
-  // 处理登录
+  // 登录处理
   const handleSignIn = async (e) => {
     e.preventDefault()
-    if (!validateForm()) return
+    setIsLoading(true)
+    setMessage('')
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+      if (error) {
+        console.error('登录错误:', error)
+        setMessage(localizeSupabaseError(error))
+      }
+    } catch (error) {
+      console.error('登录异常:', error)
+      setMessage(localizeSupabaseError(error) || '登录失败，请稍后重试')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // 邮箱格式验证
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  // 密码复杂度验证
+  const validatePassword = (password) => {
+    const hasNumber = /\d/.test(password)
+    const hasLetter = /[a-zA-Z]/.test(password)
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    const hasMinLength = password.length >= 8
+    
+    return {
+      hasNumber,
+      hasLetter,
+      hasSpecial,
+      hasMinLength,
+      isValid: hasNumber && hasLetter && hasSpecial && hasMinLength
+    }
+  }
+
+  // 忘记密码处理
+  const handleForgotPassword = async (e) => {
+    e.preventDefault()
+    
+    if (!validateEmail(resetEmail)) {
+      setMessage('请检查邮箱格式')
+      return
+    }
+    
+    setIsLoading(true)
+    setMessage('')
+
+    try {
+      const redirectTo = process.env.NEXT_PUBLIC_SITE_URL 
+        ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth?type=recovery`
+        : `${window.location.origin}/auth?type=recovery`
+
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo
+      })
+
+      if (error) {
+        setMessage(localizeSupabaseError(error.message))
+      } else {
+        setMessage('重置邮件已发送，请检查您的邮箱')
+        setShowForgotPassword(false)
+        setResetEmail('')
+      }
+    } catch (error) {
+      setMessage('发送重置邮件失败，请稍后重试')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // 更新密码处理
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault()
+    
+    const passwordValidation = validatePassword(newPassword)
+    if (!passwordValidation.isValid) {
+      setMessage('请输入正确格式的密码')
+      return
+    }
+    
+    if (newPassword !== confirmNewPassword) {
+      setMessage('两次输入的密码不一致')
+      return
+    }
 
     setIsLoading(true)
     setMessage('')
 
     try {
-      const data = await authOperations.signIn(
-        formData.email, 
-        formData.password
-      )
+      // 检查当前会话
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
       
-      setMessage('登录成功！正在跳转...')
-      // 登录成功会通过 onAuthStateChange 自动跳转
+      if (sessionError || !session) {
+        setMessage('重置会话已过期，请重新获取重置链接')
+        setIsLoading(false)
+        return
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      })
+
+      if (error) {
+        console.error('密码更新错误:', error)
+        setMessage(localizeSupabaseError(error))
+      } else {
+        setMessage('密码更新成功！正在跳转到登录页面...')
+        
+        // 延迟跳转并登出用户
+        setTimeout(async () => {
+          await supabase.auth.signOut()
+          setIsPasswordReset(false)
+          setNewPassword('')
+          setConfirmNewPassword('')
+          setMessage('')
+          // 跳转到登录页面，清除所有URL参数
+          router.replace('/auth')
+        }, 2000)
+      }
     } catch (error) {
-      console.error('登录错误:', error)
-      setMessage(error.message)
+      console.error('密码更新错误:', error)
+      setMessage(localizeSupabaseError(error) || '密码更新失败，请稍后重试')
     } finally {
       setIsLoading(false)
     }
   }
 
+
+
   return (
     <>
       <Head>
-        <title>{isLogin ? '登录' : '注册'} - 方略 Fanglue</title>
+        <title>{isPasswordReset ? '重置密码' : (isLogin ? '登录' : '注册')} - 方略 Fanglue</title>
         <meta name="description" content="方略 - 从经史到兵法，古智与算法，同答一问" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
@@ -189,147 +396,227 @@ export default function Auth() {
         {/* 主内容 */}
         <main className={styles.mainContent}>
           <div className={styles.authCard}>
-            {/* 切换标签 */}
-            <div className={styles.authTabs}>
-              <button 
-                className={`${styles.tabButton} ${isLogin ? styles.active : ''}`}
-                onClick={() => {
-                  setIsLogin(true)
-                  setErrors({})
-                  setMessage('')
-                }}
-              >
-                登录
-              </button>
-              <button 
-                className={`${styles.tabButton} ${!isLogin ? styles.active : ''}`}
-                onClick={() => {
-                  setIsLogin(false)
-                  setErrors({})
-                  setMessage('')
-                }}
-              >
-                注册
-              </button>
-            </div>
-
-            {/* 表单 */}
-            <form onSubmit={isLogin ? handleSignIn : handleSignUp} className={styles.authForm}>
-              {/* 邮箱输入 */}
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>邮箱地址<span className={styles.requiredAsterisk}> *</span></label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  className={`${styles.input} ${errors.email ? styles.error : ''}`}
-                  placeholder="请输入您的邮箱地址"
-                  disabled={isLoading}
-                />
-                {errors.email && <span className={styles.errorText}>{errors.email}</span>}
-              </div>
-
-              {/* 用户名输入（仅注册时显示） */}
-              {!isLogin && (
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>用户名<span className={styles.requiredAsterisk}> *</span></label>
-                  <input
-                    type="text"
-                    value={formData.username}
-                    onChange={(e) => handleInputChange('username', e.target.value)}
-                    className={`${styles.input} ${errors.username ? styles.error : ''}`}
-                    placeholder="至少3个字符"
-                    disabled={isLoading}
-                  />
-                  <div className={styles.hint}>
-                    {formData.username.length > 0 && (
-                      <span className={formData.username.length >= 3 ? styles.valid : styles.invalid}>
-                        {formData.username.length}/3 字符
-                      </span>
+            {/* 密码重置表单 */}
+            {isPasswordReset ? (
+              <>
+                <div className={styles.authTabs}>
+                  <div className={`${styles.tabButton} ${styles.active}`}>
+                    重置密码
+                  </div>
+                </div>
+                <form onSubmit={handleUpdatePassword} className={styles.authForm}>
+                  <div className={styles.inputGroup}>
+                    <label className={styles.label}>新密码<span className={styles.requiredAsterisk}> *</span></label>
+                    <input
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className={styles.input}
+                      placeholder="请输入至少8位字符，包含字母、数字和特殊符号"
+                      disabled={isLoading}
+                      required
+                    />
+                    {newPassword && (
+                      <div className={styles.hint}>
+                        {!validatePassword(newPassword).isValid && (
+                          <span className={styles.invalid}>
+                            请输入正确格式的密码
+                          </span>
+                        )}
+                      </div>
                     )}
                   </div>
-                  {errors.username && <span className={styles.errorText}>{errors.username}</span>}
-                </div>
-              )}
-
-              {/* 密码输入 */}
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>密码<span className={styles.requiredAsterisk}> *</span></label>
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
-                  className={`${styles.input} ${errors.password ? styles.error : ''}`}
-                  placeholder={isLogin ? "请输入密码" : "8位以上，包含数字、字母和特殊符号"}
-                  disabled={isLoading}
-                />
-                {!isLogin && formData.password && (
-                  <div className={styles.passwordStrength}>
-                    <div className={styles.strengthItem}>
-                      <span className={formData.password.length >= 8 ? styles.valid : styles.invalid}>
-                        ✓ 至少8位字符
-                      </span>
-                    </div>
-                    <div className={styles.strengthItem}>
-                      <span className={/\d/.test(formData.password) ? styles.valid : styles.invalid}>
-                        ✓ 包含数字
-                      </span>
-                    </div>
-                    <div className={styles.strengthItem}>
-                      <span className={/[a-zA-Z]/.test(formData.password) ? styles.valid : styles.invalid}>
-                        ✓ 包含字母
-                      </span>
-                    </div>
-                    <div className={styles.strengthItem}>
-                      <span className={/[!@#$%^&*(),.?":{}|<>]/.test(formData.password) ? styles.valid : styles.invalid}>
-                        ✓ 包含特殊符号
-                      </span>
-                    </div>
+                  
+                  <div className={styles.inputGroup}>
+                    <label className={styles.label}>确认新密码<span className={styles.requiredAsterisk}> *</span></label>
+                    <input
+                      type="password"
+                      value={confirmNewPassword}
+                      onChange={(e) => setConfirmNewPassword(e.target.value)}
+                      className={styles.input}
+                      placeholder="请输入至少8位字符，包含字母、数字和特殊符号"
+                      disabled={isLoading}
+                      required
+                    />
+                    {confirmNewPassword && (
+                      <div className={styles.hint}>
+                        <span className={newPassword === confirmNewPassword ? styles.valid : styles.invalid}>
+                          {newPassword === confirmNewPassword ? '✓ 密码一致' : '✗ 密码不一致'}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                )}
-                {errors.password && <span className={styles.errorText}>{errors.password}</span>}
-              </div>
-
-              {/* 确认密码（仅注册时显示） */}
-              {!isLogin && (
-                <div className={styles.inputGroup}>
-                  <label className={styles.label}>确认密码<span className={styles.requiredAsterisk}> *</span></label>
-                  <input
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                    className={`${styles.input} ${errors.confirmPassword ? styles.error : ''}`}
-                    placeholder="请再次输入密码"
-                    disabled={isLoading}
-                  />
-                  {formData.confirmPassword && (
-                    <div className={styles.hint}>
-                      <span className={formData.password === formData.confirmPassword ? styles.valid : styles.invalid}>
-                        {formData.password === formData.confirmPassword ? '✓ 密码一致' : '✗ 密码不一致'}
-                      </span>
+                  
+                  <button 
+                    type="submit" 
+                    className={styles.submitButton}
+                    disabled={isLoading || !newPassword || !confirmNewPassword || newPassword !== confirmNewPassword}
+                  >
+                    {isLoading ? '更新中...' : '更新密码'}
+                  </button>
+                  
+                  {message && (
+                    <div className={`${styles.message} ${message.includes('成功') ? styles.success : styles.error}`}>
+                      {message}
                     </div>
                   )}
-                  {errors.confirmPassword && <span className={styles.errorText}>{errors.confirmPassword}</span>}
+                </form>
+              </>
+            ) : (
+              <>
+                {/* 登录/注册切换标签 */}
+                <div className={styles.authTabs}>
+                  <button 
+                    className={`${styles.tabButton} ${isLogin ? styles.active : ''}`}
+                    onClick={() => {
+                      setIsLogin(true)
+                      setMessage('')
+                    }}
+                  >
+                    登录
+                  </button>
+                  <button 
+                    className={`${styles.tabButton} ${!isLogin ? styles.active : ''}`}
+                    onClick={() => {
+                      setIsLogin(false)
+                      setMessage('')
+                    }}
+                  >
+                    注册
+                  </button>
                 </div>
-              )}
 
-              {/* 提交按钮 */}
-              <button 
-                type="submit" 
-                className={styles.submitButton}
-                disabled={isLoading || Object.keys(errors).some(key => errors[key])}
-              >
-                {isLoading ? '处理中...' : (isLogin ? '登录' : '注册')}
-              </button>
+                {/* 登录/注册表单 */}
+                <form onSubmit={isLogin ? handleSignIn : handleSignUp} className={styles.authForm}>
+                  <div className={styles.inputGroup}>
+                    <label className={styles.label}>邮箱<span className={styles.requiredAsterisk}> *</span></label>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={handleEmailChange}
+                      className={styles.input}
+                      placeholder="请输入您的邮箱地址"
+                      disabled={isLoading}
+                      required
+                    />
+                    {email && !validateEmail(email) && (
+                      <div className={styles.hint}>
+                        <span className={styles.invalid}>
+                          请检查邮箱格式
+                        </span>
+                      </div>
+                    )}
+                  </div>
 
-              {/* 消息显示 */}
-              {message && (
-                <div className={`${styles.message} ${message.includes('成功') ? styles.success : styles.error}`}>
-                  {message}
-                </div>
-              )}
-            </form>
+                  {!isLogin && (
+                    <div className={styles.inputGroup}>
+                      <label className={styles.label}>用户名<span className={styles.requiredAsterisk}> *</span></label>
+                      <input
+                        type="text"
+                        value={username}
+                        onChange={handleUsernameChange}
+                        className={styles.input}
+                        placeholder="至少3个字符"
+                        disabled={isLoading}
+                        required
+                      />
+                      {username && username.length < 3 && (
+                        <div className={styles.hint}>
+                          <span className={styles.invalid}>
+                            用户名至少需要3个字符
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div className={styles.inputGroup}>
+                    <label className={styles.label}>密码<span className={styles.requiredAsterisk}> *</span></label>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={handlePasswordChange}
+                      className={styles.input}
+                      placeholder={isLogin ? "请输入您的密码" : "8位以上，必须包含数字、字母和特殊符号"}
+                      disabled={isLoading}
+                      required
+                    />
+                    {!isLogin && password && !validatePassword(password).isValid && (
+                      <div className={styles.hint}>
+                        <span className={styles.invalid}>
+                          请输入正确格式的密码
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {!isLogin && (
+                    <div className={styles.inputGroup}>
+                      <label className={styles.label}>确认密码<span className={styles.requiredAsterisk}> *</span></label>
+                      <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={handleConfirmPasswordChange}
+                        className={styles.input}
+                        placeholder="8位以上，必须包含数字、字母和特殊符号"
+                        disabled={isLoading}
+                        required
+                      />
+                      {confirmPassword && (
+                        <div className={styles.hint}>
+                          <span className={password === confirmPassword ? styles.valid : styles.invalid}>
+                            {password === confirmPassword ? '✓ 密码一致' : '两次输入的密码不一致'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <button 
+                    type="submit" 
+                    className={styles.submitButton}
+                    disabled={isLoading || (isLogin ? 
+                      (!email || !password || !validateEmail(email)) : 
+                      (!email || !username || !password || !confirmPassword || 
+                       !validateEmail(email) || username.length < 3 || 
+                       !validatePassword(password).isValid || password !== confirmPassword)
+                    )}
+                  >
+                    {isLoading ? (isLogin ? '登录中...' : '注册中...') : (isLogin ? '登录' : '注册')}
+                  </button>
+
+                  {isLogin && (
+                    <div className={styles.forgotPasswordLink}>
+                      <button
+                        type="button"
+                        onClick={() => setShowForgotPassword(true)}
+                        className={styles.linkButton}
+                        disabled={isLoading}
+                      >
+                        忘记密码？
+                      </button>
+                    </div>
+                  )}
+
+                  {message && (
+                    <div className={`${styles.message} ${message.includes('成功') ? styles.success : styles.error}`}>
+                      {message}
+                    </div>
+                  )}
+                </form>
+              </>
+            )}
           </div>
+
+          {/* 忘记密码模态框 */}
+          <ForgotPasswordModal 
+            showForgotPassword={showForgotPassword}
+            resetEmail={resetEmail}
+            isLoading={isLoading}
+            onClose={handleCloseForgotPassword}
+            onSubmit={handleForgotPassword}
+            onEmailChange={handleResetEmailChange}
+          />
         </main>
       </div>
     </>

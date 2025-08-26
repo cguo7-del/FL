@@ -1,0 +1,183 @@
+/* 邮箱验证成功页面样式 */
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.content {
+  background: white;
+  border-radius: 20px;
+  padding: 60px 40px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.successIcon {
+  margin-bottom: 30px;
+  animation: bounce 0.8s ease-out 0.3s both;
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -15px, 0);
+  }
+  70% {
+    transform: translate3d(0, -7px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.message {
+  font-size: 18px;
+  color: #7f8c8d;
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+.redirectInfo {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 30px;
+  border-left: 4px solid #4CAF50;
+}
+
+.redirectInfo p {
+  margin: 0;
+  font-size: 16px;
+  color: #2c3e50;
+  line-height: 1.6;
+}
+
+.redirectInfo p:first-child {
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.countdown {
+  font-size: 14px !important;
+  color: #7f8c8d !important;
+  font-weight: 400 !important;
+}
+
+.redirectButton {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+  margin-bottom: 30px;
+}
+
+.redirectButton:hover {
+  background: linear-gradient(135deg, #45a049, #4CAF50);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.redirectButton:active {
+  transform: translateY(0);
+}
+
+.footer {
+  border-top: 1px solid #ecf0f1;
+  padding-top: 20px;
+}
+
+.footer p {
+  font-size: 14px;
+  color: #95a5a6;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+  
+  .content {
+    padding: 40px 25px;
+  }
+  
+  .title {
+    font-size: 28px;
+  }
+  
+  .message {
+    font-size: 16px;
+  }
+  
+  .redirectInfo {
+    padding: 20px;
+  }
+  
+  .redirectButton {
+    padding: 12px 30px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 30px 20px;
+  }
+  
+  .title {
+    font-size: 24px;
+  }
+  
+  .message {
+    font-size: 15px;
+  }
+  
+  .redirectInfo {
+    padding: 15px;
+  }
+  
+  .redirectInfo p {
+    font-size: 15px;
+  }
+  
+  .countdown {
+    font-size: 13px !important;
+  }
+}
