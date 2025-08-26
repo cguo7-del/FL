@@ -1,9 +1,0 @@
-name = "fl-website"
-compatibility_date = "2024-09-23"
-
-# Pages configuration
-pages_build_output_dir = "out"
-
-# Environment variables for Pages Functions
-[env.production.vars]
-DEEPSEEK_API_KEY = "sk-3dd5328db9d44d9cb4e6e7df02ee4b2d"
