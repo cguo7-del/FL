@@ -23,6 +23,17 @@ export default function App({ Component, pageProps }) {
         <script src="https://fpyf8.com/88/tag.min.js" data-zone="166640" async data-cfasync="false"></script>
       </Head>
       <Component {...pageProps} />
+      
+      {/* Ezoic - bottom_of_page - bottom_of_page */}
+      <div id="ezoic-pub-ad-placeholder-103"></div>
+      <script dangerouslySetInnerHTML={{
+        __html: `
+          ezstandalone.cmd.push(function () {
+            ezstandalone.showAds(103);
+          });
+        `
+      }} />
+      {/* End Ezoic - bottom_of_page - bottom_of_page */}
     </>
   )
 }
