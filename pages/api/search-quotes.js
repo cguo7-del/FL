@@ -281,11 +281,18 @@ function extractOriginalText(content, bookName) {
   // 移除冒号前的所有内容（包括策略名称等）
   text = text.replace(/^[^：]*：/gm, '');
   
-  // 移除引号和书名号
-  text = text.replace(/[""''「」『』《》]/g, '');
+  // 移除书名和章节名格式（如"淮南子·《俶真训》"）
+  text = text.replace(/[^·]*·《[^》]*》/g, '');
+  text = text.replace(/《[^》]*》/g, '');
   
-  // 移除重复的引号（如开头的""）
-  text = text.replace(/^[""'']+/g, '').replace(/[""'']+$/g, '');
+  // 移除所有类型的引号和书名号
+  text = text.replace(/[""''「」『』《》" "]/g, '');
+  
+  // 移除重复的引号（包括英文引号）
+  text = text.replace(/^[""''""]+/g, '').replace(/[""''""]+$/g, '');
+  
+  // 移除开头和结尾的引号（确保彻底清理）
+  text = text.replace(/^["']+/g, '').replace(/["']+$/g, '');
   
   // 移除其他可能的前缀标识
   text = text.replace(/^[\s]*[-—•·]\s*/gm, '');

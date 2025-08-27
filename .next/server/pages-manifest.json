@@ -2,9 +2,8 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/collection": "pages/collection.js",
-  "/answer": "pages/answer.js",
-  "/": "pages/index.js",
+  "/privacy-policy": "pages/privacy-policy.js",
+  "/terms": "pages/terms.js",
   "/ask": "pages/ask.js",
-  "/api/search-quotes": "pages/api/search-quotes.js"
+  "/": "pages/index.js"
 }

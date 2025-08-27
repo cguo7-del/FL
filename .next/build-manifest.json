@@ -27,20 +27,20 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/answer": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/answer.js"
-    ],
     "/ask": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
       "static/chunks/pages/ask.js"
     ],
-    "/collection": [
+    "/privacy-policy": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/collection.js"
+      "static/chunks/pages/privacy-policy.js"
+    ],
+    "/terms": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/terms.js"
     ]
   },
   "ampFirstPages": []

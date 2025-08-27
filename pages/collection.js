@@ -617,6 +617,20 @@ export default function Collection() {
             <a href="#" className={styles.footerBtn} title="功能开发中，敬请期待">一日一策</a>
             <a href="/collection" className={`${styles.footerBtn} ${styles.active}`}>历问历答</a>
           </div>
+          {/* 页脚导航 */}
+          <div className={styles.footerNavigation}>
+            <span className={styles.copyright}>© 2025 Fanglue.org</span>
+            <span className={styles.navSeparator}>|</span>
+            <a href="/about" className={styles.footerNavLink}>关于我们</a>
+            <span className={styles.navSeparator}>|</span>
+            <a href="/contact" className={styles.footerNavLink}>联系我们</a>
+            <span className={styles.navSeparator}>|</span>
+            <a href="/advertise" className={styles.footerNavLink}>广告合作</a>
+            <span className={styles.navSeparator}>|</span>
+            <a href="/privacy-policy" className={styles.footerNavLink}>隐私政策</a>
+            <span className={styles.navSeparator}>|</span>
+            <a href="/terms" className={styles.footerNavLink}>服务条款</a>
+          </div>
         </footer>
       </div>
 

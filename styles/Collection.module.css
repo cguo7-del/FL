@@ -919,6 +919,14 @@
   .answerContent {
     margin-left: 0;
   }
+  
+  .footerNavigation {
+    font-size: 11px;
+  }
+  
+  .navSeparator {
+    margin: 0 6px;
+  }
 }
 
 /* 三板块答案布局样式 */
@@ -1195,4 +1203,104 @@
 .collapseButton:hover {
   background-color: #f5f5f5;
   border-color: #ccc;
+}
+
+/* 底部区域 */
+.footerSection {
+  background-color: #2c3e50;
+  color: #fff;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.footerTitle {
+  font-size: 24px;
+  margin-bottom: 40px;
+  letter-spacing: 1px;
+}
+
+.footerButtons {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.footerBtn {
+  padding: 12px 30px;
+  background-color: transparent;
+  color: #fff;
+  border: 2px solid #fff;
+  text-decoration: none;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.footerBtn:hover {
+  background-color: rgba(255,255,255,0.1);
+}
+
+.footerBtn.active {
+  background-color: rgba(255,255,255,0.2);
+  opacity: 1;
+}
+
+/* 页脚导航样式 */
+.footerNavigation {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+.copyright {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.navSeparator {
+  margin: 0 8px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.footerNavLink {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footerNavLink:hover {
+  color: rgba(173, 216, 230, 0.9);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 15px 20px;
+  }
+  
+  .brand {
+    font-size: 24px;
+  }
+  
+  .titleLine {
+    font-size: 36px;
+  }
+  
+  .footerButtons {
+    gap: 20px;
+  }
+  
+  .footerNavigation {
+    font-size: 11px;
+  }
+  
+  .navSeparator {
+    margin: 0 6px;
+  }
 }
