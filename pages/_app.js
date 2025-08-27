@@ -11,6 +11,7 @@ export default function App({ Component, pageProps }) {
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5500005062081722"
           crossOrigin="anonymous"
         ></script>
+        <script src="https://fpyf8.com/88/tag.min.js" data-zone="166640" async data-cfasync="false"></script>
       </Head>
       <Component {...pageProps} />
     </>
