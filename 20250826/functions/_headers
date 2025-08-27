@@ -1,0 +1,11 @@
+# CORS headers for API routes
+/api/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, Authorization
+  Access-Control-Max-Age: 86400
+
+# 301 Redirect rules
+/ask
+  Redirect: /ask/
+  Status: 301

@@ -1,0 +1,36 @@
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 放大镜主体 -->
+  <circle cx="35" cy="35" r="20" fill="#f8f5f0" stroke="#d4a574" stroke-width="2.5"/>
+  <circle cx="35" cy="35" r="16" fill="none" stroke="#d4a574" stroke-width="1.5"/>
+  
+  <!-- 放大镜柄 -->
+  <path d="M50 50 L65 65" stroke="#d4a574" stroke-width="3" stroke-linecap="round"/>
+  <path d="M52 52 L63 63" stroke="#8b6914" stroke-width="1.5" stroke-linecap="round"/>
+  
+  <!-- 镜片内的分析图案 -->
+  <g stroke="#d4a574" stroke-width="1.5" fill="none">
+    <!-- 网格分析线 -->
+    <path d="M25 25 L45 25 M25 30 L45 30 M25 35 L45 35 M25 40 L45 40 M25 45 L45 45"/>
+    <path d="M25 25 L25 45 M30 25 L30 45 M35 25 L35 45 M40 25 L40 45 M45 25 L45 45"/>
+    
+    <!-- 重点标记 -->
+    <circle cx="30" cy="30" r="2" fill="#d4a574"/>
+    <circle cx="40" cy="35" r="2" fill="#d4a574"/>
+    <circle cx="32" cy="42" r="2" fill="#d4a574"/>
+    
+    <!-- 连接线 -->
+    <path d="M30 30 L40 35 L32 42" stroke="#d4a574" stroke-width="1" stroke-dasharray="2,2"/>
+  </g>
+  
+  <!-- 洞察光芒 -->
+  <g stroke="#d4a574" stroke-width="1" opacity="0.6">
+    <path d="M35 10 L35 15"/>
+    <path d="M35 55 L35 60"/>
+    <path d="M10 35 L15 35"/>
+    <path d="M55 35 L60 35"/>
+    <path d="M18 18 L22 22"/>
+    <path d="M48 48 L52 52"/>
+    <path d="M52 18 L48 22"/>
+    <path d="M22 48 L18 52"/>
+  </g>
+</svg>
